@@ -3,7 +3,7 @@ $ErrorActionPreference = 'Stop'
 
 # Load config
 $scriptRoot = Split-Path -Parent $PSCommandPath
-$ConfigPath = Join-Path $scriptRoot 'config\config.psd1'
+$ConfigPath = Join-Path $scriptRoot '..\config\config.psd1'
 $cfg = Import-PowerShellDataFile -Path $ConfigPath
 
 # Auth (email + API token). Если в конфиге пусто — берём из переменной окружения.

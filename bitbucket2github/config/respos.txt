@@ -1,4 +1,0 @@
-# Used only when UseRepoListFile = $true
-# One repo slug per line:
-linkify-api
-linkify-backend

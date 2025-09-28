@@ -14,3 +14,6 @@
 [2025-09-28 21:34:21] [INFO] === TEST: using git-functions + config ===
 [2025-09-28 21:34:21] [INFO] Config: Workspace=insidednymaic, UseRepoListFile=False, DownloadOnly=True
 [2025-09-28 21:34:24] [INFO] === TEST DONE ===
+[2025-09-28 23:07:11] [INFO] === TEST: using git-functions + config ===
+[2025-09-28 23:07:11] [INFO] Config: Workspace=insidednymaic, UseRepoListFile=False, DownloadOnly=True
+[2025-09-28 23:07:12] [INFO] === TEST DONE ===
