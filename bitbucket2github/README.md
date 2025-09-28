@@ -1,20 +1,24 @@
-# BB2GH (Bitbucket → GitHub Migration)
+# BB2GH (Bitbucket → GitHub)
 
-## How it works
-- Clones all Bitbucket repositories as mirrors.
-- (Optional) rewrites bot emails (@bots.bitbucket.org) to your GitHub email.
-- Creates corresponding GitHub repositories.
-- Pushes everything (branches, tags, commits) with `--mirror`.
+## What this project does
+- Auto-discovers all repositories in a Bitbucket workspace via API (when `UseRepoListFile = $false`).
+- Downloads each repo as a **bare mirror** (all branches/tags/history).
+- (Optional) Rewrites `@bots.bitbucket.org` emails to your GitHub email.
+- (Optional) Mirrors wiki repos locally.
+- (Optional) Creates/pushes to GitHub (disabled when `DownloadOnly = $true`).
 
-## Files
-- `config/config.psd1` → settings
-- `config/repos.txt` → optional static list of repositories
-- `src/git-functions.ps1` → PowerShell functions
-- `main.ps1` → orchestrator
+## Configure
+Edit `config/config.psd1`:
+- Set `BBWorkspace`.
+- For API discovery set `UseRepoListFile = $false`, and fill `BBUser` + `BBAppPassword` (Bitbucket App Password with `repository:read`).
+- Choose SSH/HTTPS for both Bitbucket and GitHub sides.
+- Set `DownloadOnly = $true` to only download; set to `$false` to also push to GitHub.
 
 ## Run
 ```powershell
-pwsh -File C:\PROJECT\bb2gh\main.ps1
+# PowerShell 7
+pwsh -File C:\PROJECT\scripts_git\bitbucket2github\main.ps1
+
 ```
 
 # Requirements

@@ -1,0 +1,16 @@
+[2025-09-27 23:32:57] [INFO] === BB2GH START ===
+[2025-09-27 23:32:57] [INFO] Workspace: insidedynamic → GitHub Owner: ViktorNikolayevIndyn
+[2025-09-27 23:32:57] [INFO] Mode: DownloadOnly=True, DryRun=False
+[2025-09-27 23:34:45] [INFO] === BB2GH START ===
+[2025-09-27 23:34:45] [INFO] Workspace: insidedynamic → GitHub Owner: ViktorNikolayevIndyn
+[2025-09-27 23:34:45] [INFO] Mode: DownloadOnly=True, DryRun=False
+[2025-09-28 21:05:45] [INFO] === BB2GH START ===
+[2025-09-28 21:05:45] [INFO] Workspace: insidednymaic → GitHub Owner: ViktorNikolayevIndyn
+[2025-09-28 21:05:45] [INFO] Mode: DownloadOnly=True, DryRun=False
+[2025-09-28 21:28:22] [INFO] === TEST: using git-functions + config ===
+[2025-09-28 21:28:22] [INFO] Config: Workspace=insidednymaic, UseRepoListFile=False, DownloadOnly=True
+[2025-09-28 21:31:15] [INFO] === TEST: using git-functions + config ===
+[2025-09-28 21:31:15] [INFO] Config: Workspace=insidednymaic, UseRepoListFile=False, DownloadOnly=True
+[2025-09-28 21:34:21] [INFO] === TEST: using git-functions + config ===
+[2025-09-28 21:34:21] [INFO] Config: Workspace=insidednymaic, UseRepoListFile=False, DownloadOnly=True
+[2025-09-28 21:34:24] [INFO] === TEST DONE ===
