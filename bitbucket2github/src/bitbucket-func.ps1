@@ -122,3 +122,23 @@ function Mirror-Wiki {
         Push-Location $dst; git fetch --all --prune; Pop-Location
     }
 }
+
+function Rewrite-BotEmails {
+    param($cfg, [string]$RepoGitPath)
+    if (-not $cfg.RewriteBotEmail) { return }
+    if (-not (Test-Path $RepoGitPath)) { return }
+
+    Write-Log "Rewriting @bots.bitbucket.org emails → $($cfg.NewEmail) in $RepoGitPath" 'INFO' $cfg.LogDir
+    Push-Location $RepoGitPath
+    # Use here-string and escape $ to keep bash env vars intact
+$script = @"
+if echo "`$GIT_AUTHOR_EMAIL" | grep -q "@bots.bitbucket.org"; then
+  GIT_AUTHOR_EMAIL="$($cfg.NewEmail)"
+fi
+if echo "`$GIT_COMMITTER_EMAIL" | grep -q "@bots.bitbucket.org"; then
+  GIT_COMMITTER_EMAIL="$($cfg.NewEmail)"
+fi
+"@
+    git filter-branch --env-filter $script --tag-name-filter cat -- --all
+    Pop-Location
+}

@@ -2,17 +2,37 @@
 
 function Load-Manifest {
   param($cfg)
-  if (Test-Path $cfg.ManifestPath) { return Import-Csv -Path $cfg.ManifestPath -Delimiter ';' }
+  if (Test-Path $cfg.ManifestPath) {
+    $data = Import-Csv -Path $cfg.ManifestPath -Delimiter ';'
+    return @($data)  # always return an array
+  }
   return @()
 }
+
 function Save-Manifest {
   param($cfg, $rows)
   $dir = Split-Path $cfg.ManifestPath -Parent
   New-Item -ItemType Directory -Path $dir -Force | Out-Null
-  $rows | Export-Csv -Path $cfg.ManifestPath -Delimiter ';' -NoTypeInformation -Encoding UTF8
+
+  # Ensure $rows is enumerable (Export-Csv expects a collection)
+  $toWrite = @($rows)
+  $toWrite | Export-Csv -Path $cfg.ManifestPath -Delimiter ';' -NoTypeInformation -Encoding UTF8
 }
+
 function New-ManifestRow {
-  param($cfg, [string]$Id,[string]$Ws,[string]$PKey,[string]$PName,[string]$Slug,[string]$Owner,[string]$Repo,[string]$Visibility,[string]$Backup,[string]$Lang)
+  param(
+    $cfg,
+    [string]$Id,
+    [string]$Ws,
+    [string]$PKey,
+    [string]$PName,
+    [string]$Slug,
+    [string]$Owner,
+    [string]$Repo,
+    [string]$Visibility,
+    [string]$Backup,
+    [string]$Lang
+  )
   [PSCustomObject]@{
     id                = $Id
     bb_workspace      = $Ws
@@ -30,24 +50,37 @@ function New-ManifestRow {
     target_url        = ''
   }
 }
+
 function Upsert-ManifestRow {
   param($cfg, $manifest, [string]$Slug, $rowToMerge)
-  $found = $manifest | Where-Object { $_.bb_repo_slug -eq $Slug } | Select-Object -First 1
+
+  # Normalize to array
+  $list = @($manifest)
+
+  # Try find existing row by slug
+  $found = $list | Where-Object { $_.bb_repo_slug -eq $Slug } | Select-Object -First 1
+
   if ($found) {
     foreach ($p in $rowToMerge.PSObject.Properties) {
-      if ($p.Value -and ($p.Name -ne 'id')) { $found.$($p.Name) = $p.Value }
+      if ($p.Name -ne 'id' -and $null -ne $p.Value -and "$($p.Value)".Length -gt 0) {
+        $found.$($p.Name) = $p.Value
+      }
     }
-    return ,$manifest
   } else {
-    return ,@($manifest + $rowToMerge)
+    $list += $rowToMerge
   }
+
+  return ,$list
 }
+
 function Set-ManifestStatus {
   param($manifest,[string]$Slug,[string]$Status,[string]$TargetUrl='')
-  $found = $manifest | Where-Object { $_.bb_repo_slug -eq $Slug } | Select-Object -First 1
+
+  $list = @($manifest)
+  $found = $list | Where-Object { $_.bb_repo_slug -eq $Slug } | Select-Object -First 1
   if ($found) {
     $found.export_status = $Status
     if ($TargetUrl) { $found.target_url = $TargetUrl }
   }
-  return ,$manifest
+  return ,$list
 }
