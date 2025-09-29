@@ -3,7 +3,7 @@
   BBWorkspace              = 'insidednymaic'
   BBAuthMode               = 'HTTPS'
   BBUser                   = 'viktor.nikolayev@gmail.com'   # Atlassian email for REST API
-  BBAppPassword            = 'ATATT3xFfGF0pHOmJZvEg2PQLmAhNge2Yl8uW6kgtnVARWuyPL2S03gk9F7TtEd-YWa-OO9jhnv73AEbmk4wedExW7OaCh_UgqxWSZQR0ujdE57QWkPbl-1zBhYNrHFB6NV7CeYE4nyUQZQ9f0cBNPXBBmO5e318E1aZC3hJQlsRXI3baOIsNgY=338E3735'                              # API token (leave empty to use env var)
+  BBAppPassword            = ''                              # API token (leave empty to use env var)
   BBGitUser                = 'vnikolayev'                    # Bitbucket username for Git over HTTPS
 
   # ===== GitHub =====

@@ -1,21 +1,19 @@
 #Requires -Version 7
 $ErrorActionPreference = 'Stop'
 
-# Resolve paths
 $scriptRoot = Split-Path -Parent $PSCommandPath
 $ConfigPath = Join-Path $scriptRoot 'config\config.psd1'
-$Functions  = Join-Path $scriptRoot 'src\git-functions.ps1'
+. (Join-Path $scriptRoot 'src\load.ps1')
 
-# Load
-. $Functions
 $cfg = Import-PowerShellDataFile -Path $ConfigPath
-Ensure-Dirs -cfg $cfg
+$cfg = Normalize-CfgPaths -cfg $cfg
 
+Ensure-Dirs -cfg $cfg
 Write-Log "=== BB2GH RUN ===" 'INFO' $cfg.LogDir
 Write-Log ("Workspace={0}; DownloadOnly={1}" -f $cfg.BBWorkspace,$cfg.DownloadOnly) 'INFO' $cfg.LogDir
 
-# ---------- Phase 1: Prepare manifest (names, owners, backup paths, language) ----------
-$meta = Get-RepoMetaList -cfg $cfg       # Slug + ProjectKey/Name
+# Phase 1: prepare manifest
+$meta = Get-RepoMetaList -cfg $cfg
 $manifest = Load-Manifest -cfg $cfg
 
 $idx=0; $total=$meta.Count
@@ -42,7 +40,7 @@ foreach ($it in $meta) {
 Save-Manifest -cfg $cfg -rows $manifest
 Write-Log "Manifest prepared/updated: $($cfg.ManifestPath)" 'INFO' $cfg.LogDir
 
-# ---------- Phase 2: Execute (backup + optional import) ----------
+# Phase 2: execute by CSV
 $manifest = Load-Manifest -cfg $cfg
 $rows = $manifest | Where-Object { $_.to_export -match '^(true|1|yes)$' }
 $idx=0; $total=$rows.Count
@@ -56,18 +54,15 @@ foreach ($row in $rows) {
 
   Write-Log ("[RUN {0}/{1}] {2} → {3}/{4}" -f $idx,$total,$slug,$owner,$repo) 'INFO' $cfg.LogDir
   try {
-    # 1) Bitbucket mirror (HTTPS)
     $mirror = Mirror-Clone -cfg $cfg -Repo $slug
-    if ($cfg.RewriteBotEmail) { Rewrite-BotEmails -cfg $cfg -RepoGitPath $mirror }
+    Rewrite-BotEmails -cfg $cfg -RepoGitPath $mirror
     Mirror-Wiki -cfg $cfg -Repo $slug
 
     if (-not $cfg.DownloadOnly) {
-      # 2) GitHub create/push
       Ensure-GitHubRepo -cfg $cfg -Repo $repo -ProjectKey $row.bb_project_key -Owner $owner -Visibility $vis
       Push-Mirror      -cfg $cfg -Repo $repo -RepoGitPath $mirror -Owner $owner
       Push-LFS         -cfg $cfg -Repo $repo
 
-      # 3) Topics / Teams / Projects
       $topics = @()
       if ($cfg.UseTopics -and $row.bb_project_key) {
         $topics += "$($cfg.ProjectTopicPrefix):$($row.bb_project_key)"
