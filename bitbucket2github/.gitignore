@@ -1,5 +1,6 @@
 # secrets / local env
 
 config/config.psd1
-logs/
+
 work/
+logs/

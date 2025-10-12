@@ -249,3 +249,266 @@ Check the spelling of the name, or if a path was included, verify that the path 
 [2025-09-29 02:39:43] [INFO] [PREP 13/46] linkify-api (proj=LINKIFY)
 [2025-09-29 02:39:43] [INFO] [PREP 14/46] modx.alkes-rrn-hsrn-aeco (proj=WEBMODX)
 [2025-09-29 02:40:12] [INFO] [PREP 15/46] modx.amonsecurity (proj=WEBMODX)
+[2025-09-29 02:40:29] [INFO] [PREP 16/46] modx.basic-2.0 (proj=WEBMODX)
+[2025-09-29 02:40:46] [INFO] [PREP 17/46] modx.bj-immo (proj=WEBMODX)
+[2025-09-29 02:41:03] [INFO] [PREP 18/46] modx.dasneueleben.reabcenter (proj=WEBMODX)
+[2025-09-29 02:41:20] [INFO] [PREP 19/46] modx.hotelamrathaus (proj=WEBMODX)
+[2025-09-29 02:41:44] [INFO] [PREP 20/46] modx.infido (proj=WEBMODX)
+[2025-09-29 02:42:01] [INFO] [PREP 21/46] modx.klimadelux (proj=WEBMODX)
+[2025-09-29 02:42:16] [INFO] [PREP 22/46] modx.mks-manuel (proj=WEBMODX)
+[2025-09-29 02:42:34] [INFO] [PREP 23/46] modx.rero (proj=WEBMODX)
+[2025-09-29 02:42:50] [INFO] [PREP 24/46] modx.signalio (proj=WEBMODX)
+[2025-09-29 02:43:07] [INFO] [PREP 25/46] modx.taxiretzer (proj=WEBMODX)
+[2025-09-29 02:43:27] [INFO] [PREP 26/46] netyo_plm (proj=CRC)
+[2025-09-29 02:43:28] [INFO] [PREP 27/46] netyo.http.api (proj=CRC)
+[2025-09-29 02:43:29] [INFO] [PREP 28/46] ns_amon-security_azure (proj=NOT)
+[2025-09-29 02:43:46] [INFO] [PREP 29/46] ns_bj_azure (proj=NOT)
+[2025-09-29 02:44:03] [INFO] [PREP 30/46] ns_coffee-generator (proj=NOT)
+[2025-09-29 02:44:04] [INFO] [PREP 31/46] ns_essiyt-api_azre (proj=NOT)
+[2025-09-29 02:44:04] [INFO] [PREP 32/46] ns_freshcoffee (proj=NOT)
+[2025-09-29 02:44:27] [INFO] [PREP 33/46] ns_g12gv-site_azure (proj=NOT)
+[2025-09-29 02:44:37] [INFO] [PREP 34/46] ns_infido_azure (proj=NOT)
+[2025-09-29 02:44:54] [INFO] [PREP 35/46] ns_reab_center_azure (proj=NOT)
+[2025-09-29 02:45:10] [INFO] [PREP 36/46] ns_tatiana-blum_azure (proj=NOT)
+[2025-09-29 02:45:11] [INFO] [PREP 37/46] ns.mks (proj=NOT)
+[2025-09-29 02:45:29] [INFO] [PREP 38/46] oco-wako-app (proj=OCO)
+[2025-09-29 02:45:30] [INFO] [PREP 39/46] php-api-echo (proj=PAE)
+[2025-09-29 02:45:30] [INFO] [PREP 40/46] php-chatgpt-api (proj=PAE)
+[2025-09-29 02:45:31] [INFO] [PREP 41/46] proxy.clinet.linkify (proj=LINKIFY)
+[2025-09-29 02:45:32] [INFO] [PREP 42/46] safemybike (proj=WAST)
+[2025-09-29 02:45:32] [INFO] [PREP 43/46] safemylife (proj=WAST)
+[2025-09-29 02:45:34] [INFO] [PREP 44/46] scamscan-web (proj=SCAM)
+[2025-09-29 02:45:34] [INFO] [PREP 45/46] scmscan_mobapp (proj=SCAM)
+[2025-09-29 02:45:35] [INFO] [PREP 46/46] shop.woocommerce.freshcoffee (proj=WEB)
+[2025-09-29 02:46:00] [INFO] Manifest prepared/updated: C:\PROJECT\scripts_git\bitbucket2github\.\config\repos-manifest.csv
+[2025-09-29 02:46:00] [INFO] [RUN 1/46] elo_office_import → ViktorNikolayevIndyn/dms.elo-office-import
+[2025-09-29 02:46:00] [INFO] Mirror exists → fetch: C:\PROJECT\scripts_git\bitbucket2github\.\work\elo_office_import.git
+[2025-09-29 02:46:01] [INFO] Rewriting @bots.bitbucket.org emails → vn@insidedynamic.de in C:\PROJECT\scripts_git\bitbucket2github\.\work\elo_office_import.git
+[2025-09-29 02:46:17] [INFO] Cloning wiki mirror: https:***@bitbucket.org/insidednymaic/elo_office_import.wiki.git → C:\PROJECT\scripts_git\bitbucket2github\.\work\elo_office_import.wiki.git
+[2025-09-29 02:46:18] [INFO] OK: elo_office_import
+[2025-09-29 02:46:18] [INFO] [RUN 2/46] essity-gateandapp → ViktorNikolayevIndyn/es.essity-gateandapp
+[2025-09-29 02:46:18] [INFO] Mirror exists → fetch: C:\PROJECT\scripts_git\bitbucket2github\.\work\essity-gateandapp.git
+[2025-09-29 02:46:19] [INFO] Rewriting @bots.bitbucket.org emails → vn@insidedynamic.de in C:\PROJECT\scripts_git\bitbucket2github\.\work\essity-gateandapp.git
+[2025-09-29 02:47:17] [INFO] Cloning wiki mirror: https:***@bitbucket.org/insidednymaic/essity-gateandapp.wiki.git → C:\PROJECT\scripts_git\bitbucket2github\.\work\essity-gateandapp.wiki.git
+[2025-09-29 02:47:18] [INFO] OK: essity-gateandapp
+[2025-09-29 02:47:18] [INFO] [RUN 3/46] essity.http.api → ViktorNikolayevIndyn/es.essity.http.api
+[2025-09-29 02:47:18] [INFO] Mirror exists → fetch: C:\PROJECT\scripts_git\bitbucket2github\.\work\essity.http.api.git
+[2025-09-29 02:47:19] [INFO] Rewriting @bots.bitbucket.org emails → vn@insidedynamic.de in C:\PROJECT\scripts_git\bitbucket2github\.\work\essity.http.api.git
+[2025-09-29 02:50:59] [INFO] Cloning wiki mirror: https:***@bitbucket.org/insidednymaic/essity.http.api.wiki.git → C:\PROJECT\scripts_git\bitbucket2github\.\work\essity.http.api.wiki.git
+[2025-09-29 02:51:00] [INFO] OK: essity.http.api
+[2025-09-29 02:51:00] [INFO] [RUN 4/46] essity.http.web.gatescanner → ViktorNikolayevIndyn/es.essity.http.web.gatescanner
+[2025-09-29 02:51:00] [INFO] Mirror exists → fetch: C:\PROJECT\scripts_git\bitbucket2github\.\work\essity.http.web.gatescanner.git
+[2025-09-29 02:51:02] [INFO] Rewriting @bots.bitbucket.org emails → vn@insidedynamic.de in C:\PROJECT\scripts_git\bitbucket2github\.\work\essity.http.web.gatescanner.git
+[2025-09-29 02:52:04] [INFO] Cloning wiki mirror: https:***@bitbucket.org/insidednymaic/essity.http.web.gatescanner.wiki.git → C:\PROJECT\scripts_git\bitbucket2github\.\work\essity.http.web.gatescanner.wiki.git
+[2025-09-29 02:52:04] [INFO] OK: essity.http.web.gatescanner
+[2025-09-29 02:52:04] [INFO] [RUN 5/46] fido_hrview → ViktorNikolayevIndyn/dms.fido-hrview
+[2025-09-29 02:52:04] [INFO] Mirror exists → fetch: C:\PROJECT\scripts_git\bitbucket2github\.\work\fido_hrview.git
+[2025-09-29 02:52:05] [INFO] Rewriting @bots.bitbucket.org emails → vn@insidedynamic.de in C:\PROJECT\scripts_git\bitbucket2github\.\work\fido_hrview.git
+[2025-09-29 02:52:40] [INFO] Cloning wiki mirror: https:***@bitbucket.org/insidednymaic/fido_hrview.wiki.git → C:\PROJECT\scripts_git\bitbucket2github\.\work\fido_hrview.wiki.git
+[2025-09-29 02:52:41] [INFO] OK: fido_hrview
+[2025-09-29 02:52:41] [INFO] [RUN 6/46] firstvujs → ViktorNikolayevIndyn/crc.firstvujs
+[2025-09-29 02:52:41] [INFO] Mirror exists → fetch: C:\PROJECT\scripts_git\bitbucket2github\.\work\firstvujs.git
+[2025-09-29 02:52:42] [INFO] Rewriting @bots.bitbucket.org emails → vn@insidedynamic.de in C:\PROJECT\scripts_git\bitbucket2github\.\work\firstvujs.git
+[2025-09-29 02:52:55] [INFO] Cloning wiki mirror: https:***@bitbucket.org/insidednymaic/firstvujs.wiki.git → C:\PROJECT\scripts_git\bitbucket2github\.\work\firstvujs.wiki.git
+[2025-09-29 02:52:55] [INFO] OK: firstvujs
+[2025-09-29 02:52:55] [INFO] [RUN 7/46] freshcoffeeonline.coffee-generator.vj → ViktorNikolayevIndyn/web.freshcoffeeonline.coffee-generator.vj
+[2025-09-29 02:52:55] [INFO] Mirror exists → fetch: C:\PROJECT\scripts_git\bitbucket2github\.\work\freshcoffeeonline.coffee-generator.vj.git
+[2025-09-29 02:52:56] [INFO] Rewriting @bots.bitbucket.org emails → vn@insidedynamic.de in C:\PROJECT\scripts_git\bitbucket2github\.\work\freshcoffeeonline.coffee-generator.vj.git
+[2025-09-29 02:53:34] [INFO] Cloning wiki mirror: https:***@bitbucket.org/insidednymaic/freshcoffeeonline.coffee-generator.vj.wiki.git → C:\PROJECT\scripts_git\bitbucket2github\.\work\freshcoffeeonline.coffee-generator.vj.wiki.git
+[2025-09-29 02:53:34] [INFO] OK: freshcoffeeonline.coffee-generator.vj
+[2025-09-29 02:53:34] [INFO] [RUN 8/46] html.tatiana-blum → ViktorNikolayevIndyn/web.html.tatiana-blum
+[2025-09-29 02:53:34] [INFO] Mirror exists → fetch: C:\PROJECT\scripts_git\bitbucket2github\.\work\html.tatiana-blum.git
+[2025-09-29 02:53:35] [INFO] Rewriting @bots.bitbucket.org emails → vn@insidedynamic.de in C:\PROJECT\scripts_git\bitbucket2github\.\work\html.tatiana-blum.git
+[2025-09-29 02:53:48] [INFO] Cloning wiki mirror: https:***@bitbucket.org/insidednymaic/html.tatiana-blum.wiki.git → C:\PROJECT\scripts_git\bitbucket2github\.\work\html.tatiana-blum.wiki.git
+[2025-09-29 02:53:49] [INFO] OK: html.tatiana-blum
+[2025-09-29 02:53:49] [INFO] [RUN 9/46] ibs-laravel-rep → ViktorNikolayevIndyn/not.ibs-laravel-rep
+[2025-09-29 02:53:49] [INFO] Mirror exists → fetch: C:\PROJECT\scripts_git\bitbucket2github\.\work\ibs-laravel-rep.git
+[2025-09-29 02:53:50] [INFO] Rewriting @bots.bitbucket.org emails → vn@insidedynamic.de in C:\PROJECT\scripts_git\bitbucket2github\.\work\ibs-laravel-rep.git
+[2025-09-29 02:54:03] [INFO] Cloning wiki mirror: https:***@bitbucket.org/insidednymaic/ibs-laravel-rep.wiki.git → C:\PROJECT\scripts_git\bitbucket2github\.\work\ibs-laravel-rep.wiki.git
+[2025-09-29 02:54:04] [INFO] OK: ibs-laravel-rep
+[2025-09-29 02:54:04] [INFO] [RUN 10/46] io_module → ViktorNikolayevIndyn/crc.io-module
+[2025-09-29 02:54:04] [INFO] Mirror exists → fetch: C:\PROJECT\scripts_git\bitbucket2github\.\work\io_module.git
+[2025-09-29 02:54:05] [INFO] Rewriting @bots.bitbucket.org emails → vn@insidedynamic.de in C:\PROJECT\scripts_git\bitbucket2github\.\work\io_module.git
+[2025-09-29 02:54:43] [INFO] Cloning wiki mirror: https:***@bitbucket.org/insidednymaic/io_module.wiki.git → C:\PROJECT\scripts_git\bitbucket2github\.\work\io_module.wiki.git
+[2025-09-29 02:54:44] [INFO] OK: io_module
+[2025-09-29 02:54:44] [INFO] [RUN 11/46] lexofficeecodms → ViktorNikolayevIndyn/pae.lexofficeecodms
+[2025-09-29 02:54:44] [INFO] Mirror exists → fetch: C:\PROJECT\scripts_git\bitbucket2github\.\work\lexofficeecodms.git
+[2025-09-29 02:54:45] [INFO] Rewriting @bots.bitbucket.org emails → vn@insidedynamic.de in C:\PROJECT\scripts_git\bitbucket2github\.\work\lexofficeecodms.git
+[2025-09-29 02:55:08] [INFO] Cloning wiki mirror: https:***@bitbucket.org/insidednymaic/lexofficeecodms.wiki.git → C:\PROJECT\scripts_git\bitbucket2github\.\work\lexofficeecodms.wiki.git
+[2025-09-29 02:55:09] [INFO] OK: lexofficeecodms
+[2025-09-29 02:55:09] [INFO] [RUN 12/46] linkify → ViktorNikolayevIndyn/linkify.linkify
+[2025-09-29 02:55:09] [INFO] Mirror exists → fetch: C:\PROJECT\scripts_git\bitbucket2github\.\work\linkify.git
+[2025-09-29 02:55:10] [INFO] Rewriting @bots.bitbucket.org emails → vn@insidedynamic.de in C:\PROJECT\scripts_git\bitbucket2github\.\work\linkify.git
+[2025-09-29 03:01:23] [INFO] Cloning wiki mirror: https:***@bitbucket.org/insidednymaic/linkify.wiki.git → C:\PROJECT\scripts_git\bitbucket2github\.\work\linkify.wiki.git
+[2025-09-29 03:01:24] [INFO] OK: linkify
+[2025-09-29 03:01:24] [INFO] [RUN 13/46] linkify-api → ViktorNikolayevIndyn/linkify.linkify-api
+[2025-09-29 03:01:24] [INFO] Mirror exists → fetch: C:\PROJECT\scripts_git\bitbucket2github\.\work\linkify-api.git
+[2025-09-29 03:01:25] [INFO] Rewriting @bots.bitbucket.org emails → vn@insidedynamic.de in C:\PROJECT\scripts_git\bitbucket2github\.\work\linkify-api.git
+[2025-09-29 03:02:48] [INFO] Cloning wiki mirror: https:***@bitbucket.org/insidednymaic/linkify-api.wiki.git → C:\PROJECT\scripts_git\bitbucket2github\.\work\linkify-api.wiki.git
+[2025-09-29 03:02:49] [INFO] OK: linkify-api
+[2025-09-29 03:02:49] [INFO] [RUN 14/46] modx.alkes-rrn-hsrn-aeco → ViktorNikolayevIndyn/webmodx.modx.alkes-rrn-hsrn-aeco
+[2025-09-29 03:02:49] [INFO] Mirror exists → fetch: C:\PROJECT\scripts_git\bitbucket2github\.\work\modx.alkes-rrn-hsrn-aeco.git
+[2025-09-29 03:02:50] [INFO] Rewriting @bots.bitbucket.org emails → vn@insidedynamic.de in C:\PROJECT\scripts_git\bitbucket2github\.\work\modx.alkes-rrn-hsrn-aeco.git
+[2025-09-29 03:03:09] [INFO] Cloning wiki mirror: https:***@bitbucket.org/insidednymaic/modx.alkes-rrn-hsrn-aeco.wiki.git → C:\PROJECT\scripts_git\bitbucket2github\.\work\modx.alkes-rrn-hsrn-aeco.wiki.git
+[2025-09-29 03:03:10] [INFO] OK: modx.alkes-rrn-hsrn-aeco
+[2025-09-29 03:03:11] [INFO] [RUN 15/46] modx.amonsecurity → ViktorNikolayevIndyn/webmodx.modx.amonsecurity
+[2025-09-29 03:03:11] [INFO] Mirror exists → fetch: C:\PROJECT\scripts_git\bitbucket2github\.\work\modx.amonsecurity.git
+[2025-09-29 03:03:12] [INFO] Rewriting @bots.bitbucket.org emails → vn@insidedynamic.de in C:\PROJECT\scripts_git\bitbucket2github\.\work\modx.amonsecurity.git
+[2025-09-29 03:03:32] [INFO] Cloning wiki mirror: https:***@bitbucket.org/insidednymaic/modx.amonsecurity.wiki.git → C:\PROJECT\scripts_git\bitbucket2github\.\work\modx.amonsecurity.wiki.git
+[2025-09-29 03:03:33] [INFO] OK: modx.amonsecurity
+[2025-09-29 03:03:33] [INFO] [RUN 16/46] modx.basic-2.0 → ViktorNikolayevIndyn/webmodx.modx.basic-2.0
+[2025-09-29 03:03:33] [INFO] Mirror exists → fetch: C:\PROJECT\scripts_git\bitbucket2github\.\work\modx.basic-2.0.git
+[2025-09-29 03:03:34] [INFO] Rewriting @bots.bitbucket.org emails → vn@insidedynamic.de in C:\PROJECT\scripts_git\bitbucket2github\.\work\modx.basic-2.0.git
+[2025-09-29 03:04:11] [INFO] Cloning wiki mirror: https:***@bitbucket.org/insidednymaic/modx.basic-2.0.wiki.git → C:\PROJECT\scripts_git\bitbucket2github\.\work\modx.basic-2.0.wiki.git
+[2025-09-29 03:04:12] [INFO] OK: modx.basic-2.0
+[2025-09-29 03:04:12] [INFO] [RUN 17/46] modx.bj-immo → ViktorNikolayevIndyn/webmodx.modx.bj-immo
+[2025-09-29 03:04:12] [INFO] Mirror exists → fetch: C:\PROJECT\scripts_git\bitbucket2github\.\work\modx.bj-immo.git
+[2025-09-29 03:04:13] [INFO] Rewriting @bots.bitbucket.org emails → vn@insidedynamic.de in C:\PROJECT\scripts_git\bitbucket2github\.\work\modx.bj-immo.git
+[2025-09-29 03:04:27] [INFO] Cloning wiki mirror: https:***@bitbucket.org/insidednymaic/modx.bj-immo.wiki.git → C:\PROJECT\scripts_git\bitbucket2github\.\work\modx.bj-immo.wiki.git
+[2025-09-29 03:04:28] [INFO] OK: modx.bj-immo
+[2025-09-29 03:04:28] [INFO] [RUN 18/46] modx.dasneueleben.reabcenter → ViktorNikolayevIndyn/webmodx.modx.dasneueleben.reabcenter
+[2025-09-29 03:04:28] [INFO] Mirror exists → fetch: C:\PROJECT\scripts_git\bitbucket2github\.\work\modx.dasneueleben.reabcenter.git
+[2025-09-29 03:04:29] [INFO] Rewriting @bots.bitbucket.org emails → vn@insidedynamic.de in C:\PROJECT\scripts_git\bitbucket2github\.\work\modx.dasneueleben.reabcenter.git
+[2025-09-29 03:04:44] [INFO] Cloning wiki mirror: https:***@bitbucket.org/insidednymaic/modx.dasneueleben.reabcenter.wiki.git → C:\PROJECT\scripts_git\bitbucket2github\.\work\modx.dasneueleben.reabcenter.wiki.git
+[2025-09-29 03:04:45] [INFO] OK: modx.dasneueleben.reabcenter
+[2025-09-29 03:04:45] [INFO] [RUN 19/46] modx.hotelamrathaus → ViktorNikolayevIndyn/webmodx.modx.hotelamrathaus
+[2025-09-29 03:04:45] [INFO] Mirror exists → fetch: C:\PROJECT\scripts_git\bitbucket2github\.\work\modx.hotelamrathaus.git
+[2025-09-29 03:04:46] [INFO] Rewriting @bots.bitbucket.org emails → vn@insidedynamic.de in C:\PROJECT\scripts_git\bitbucket2github\.\work\modx.hotelamrathaus.git
+[2025-09-29 03:04:59] [INFO] Cloning wiki mirror: https:***@bitbucket.org/insidednymaic/modx.hotelamrathaus.wiki.git → C:\PROJECT\scripts_git\bitbucket2github\.\work\modx.hotelamrathaus.wiki.git
+[2025-09-29 03:05:00] [INFO] OK: modx.hotelamrathaus
+[2025-09-29 03:05:00] [INFO] [RUN 20/46] modx.infido → ViktorNikolayevIndyn/webmodx.modx.infido
+[2025-09-29 03:05:00] [INFO] Mirror exists → fetch: C:\PROJECT\scripts_git\bitbucket2github\.\work\modx.infido.git
+[2025-09-29 03:05:02] [INFO] Rewriting @bots.bitbucket.org emails → vn@insidedynamic.de in C:\PROJECT\scripts_git\bitbucket2github\.\work\modx.infido.git
+[2025-09-29 03:05:17] [INFO] Cloning wiki mirror: https:***@bitbucket.org/insidednymaic/modx.infido.wiki.git → C:\PROJECT\scripts_git\bitbucket2github\.\work\modx.infido.wiki.git
+[2025-09-29 03:05:18] [INFO] OK: modx.infido
+[2025-09-29 03:05:18] [INFO] [RUN 21/46] modx.klimadelux → ViktorNikolayevIndyn/webmodx.modx.klimadelux
+[2025-09-29 03:05:18] [INFO] Mirror exists → fetch: C:\PROJECT\scripts_git\bitbucket2github\.\work\modx.klimadelux.git
+[2025-09-29 03:05:19] [INFO] Rewriting @bots.bitbucket.org emails → vn@insidedynamic.de in C:\PROJECT\scripts_git\bitbucket2github\.\work\modx.klimadelux.git
+[2025-09-29 03:05:39] [INFO] Cloning wiki mirror: https:***@bitbucket.org/insidednymaic/modx.klimadelux.wiki.git → C:\PROJECT\scripts_git\bitbucket2github\.\work\modx.klimadelux.wiki.git
+[2025-09-29 03:05:40] [INFO] OK: modx.klimadelux
+[2025-09-29 03:05:40] [INFO] [RUN 22/46] modx.mks-manuel → ViktorNikolayevIndyn/webmodx.modx.mks-manuel
+[2025-09-29 03:05:40] [INFO] Mirror exists → fetch: C:\PROJECT\scripts_git\bitbucket2github\.\work\modx.mks-manuel.git
+[2025-09-29 03:05:41] [INFO] Rewriting @bots.bitbucket.org emails → vn@insidedynamic.de in C:\PROJECT\scripts_git\bitbucket2github\.\work\modx.mks-manuel.git
+[2025-09-29 03:05:59] [INFO] Cloning wiki mirror: https:***@bitbucket.org/insidednymaic/modx.mks-manuel.wiki.git → C:\PROJECT\scripts_git\bitbucket2github\.\work\modx.mks-manuel.wiki.git
+[2025-09-29 03:06:00] [INFO] OK: modx.mks-manuel
+[2025-09-29 03:06:00] [INFO] [RUN 23/46] modx.rero → ViktorNikolayevIndyn/webmodx.modx.rero
+[2025-09-29 03:06:00] [INFO] Mirror exists → fetch: C:\PROJECT\scripts_git\bitbucket2github\.\work\modx.rero.git
+[2025-09-29 03:06:02] [INFO] Rewriting @bots.bitbucket.org emails → vn@insidedynamic.de in C:\PROJECT\scripts_git\bitbucket2github\.\work\modx.rero.git
+[2025-09-29 03:06:26] [INFO] Cloning wiki mirror: https:***@bitbucket.org/insidednymaic/modx.rero.wiki.git → C:\PROJECT\scripts_git\bitbucket2github\.\work\modx.rero.wiki.git
+[2025-09-29 03:06:27] [INFO] OK: modx.rero
+[2025-09-29 03:06:27] [INFO] [RUN 24/46] modx.signalio → ViktorNikolayevIndyn/webmodx.modx.signalio
+[2025-09-29 03:06:27] [INFO] Mirror exists → fetch: C:\PROJECT\scripts_git\bitbucket2github\.\work\modx.signalio.git
+[2025-09-29 03:06:28] [INFO] Rewriting @bots.bitbucket.org emails → vn@insidedynamic.de in C:\PROJECT\scripts_git\bitbucket2github\.\work\modx.signalio.git
+[2025-09-29 03:06:44] [INFO] Cloning wiki mirror: https:***@bitbucket.org/insidednymaic/modx.signalio.wiki.git → C:\PROJECT\scripts_git\bitbucket2github\.\work\modx.signalio.wiki.git
+[2025-09-29 03:06:44] [INFO] OK: modx.signalio
+[2025-09-29 03:06:44] [INFO] [RUN 25/46] modx.taxiretzer → ViktorNikolayevIndyn/webmodx.modx.taxiretzer
+[2025-09-29 03:06:44] [INFO] Mirror exists → fetch: C:\PROJECT\scripts_git\bitbucket2github\.\work\modx.taxiretzer.git
+[2025-09-29 03:06:45] [INFO] Rewriting @bots.bitbucket.org emails → vn@insidedynamic.de in C:\PROJECT\scripts_git\bitbucket2github\.\work\modx.taxiretzer.git
+[2025-09-29 03:07:23] [INFO] Cloning wiki mirror: https:***@bitbucket.org/insidednymaic/modx.taxiretzer.wiki.git → C:\PROJECT\scripts_git\bitbucket2github\.\work\modx.taxiretzer.wiki.git
+[2025-09-29 03:07:24] [INFO] OK: modx.taxiretzer
+[2025-09-29 03:07:24] [INFO] [RUN 26/46] netyo_plm → ViktorNikolayevIndyn/crc.netyo-plm
+[2025-09-29 03:07:24] [INFO] Mirror exists → fetch: C:\PROJECT\scripts_git\bitbucket2github\.\work\netyo_plm.git
+[2025-09-29 03:07:25] [INFO] Rewriting @bots.bitbucket.org emails → vn@insidedynamic.de in C:\PROJECT\scripts_git\bitbucket2github\.\work\netyo_plm.git
+[2025-09-29 03:12:26] [INFO] Cloning wiki mirror: https:***@bitbucket.org/insidednymaic/netyo_plm.wiki.git → C:\PROJECT\scripts_git\bitbucket2github\.\work\netyo_plm.wiki.git
+[2025-09-29 03:12:27] [INFO] OK: netyo_plm
+[2025-09-29 03:12:27] [INFO] [RUN 27/46] netyo.http.api → ViktorNikolayevIndyn/crc.netyo.http.api
+[2025-09-29 03:12:27] [INFO] Mirror exists → fetch: C:\PROJECT\scripts_git\bitbucket2github\.\work\netyo.http.api.git
+[2025-09-29 03:12:28] [INFO] Rewriting @bots.bitbucket.org emails → vn@insidedynamic.de in C:\PROJECT\scripts_git\bitbucket2github\.\work\netyo.http.api.git
+[2025-09-29 03:20:09] [INFO] Cloning wiki mirror: https:***@bitbucket.org/insidednymaic/netyo.http.api.wiki.git → C:\PROJECT\scripts_git\bitbucket2github\.\work\netyo.http.api.wiki.git
+[2025-09-29 03:20:10] [INFO] OK: netyo.http.api
+[2025-09-29 03:20:10] [INFO] [RUN 28/46] ns_amon-security_azure → ViktorNikolayevIndyn/not.ns-amon-security-azure
+[2025-09-29 03:20:10] [INFO] Mirror exists → fetch: C:\PROJECT\scripts_git\bitbucket2github\.\work\ns_amon-security_azure.git
+[2025-09-29 03:20:11] [INFO] Rewriting @bots.bitbucket.org emails → vn@insidedynamic.de in C:\PROJECT\scripts_git\bitbucket2github\.\work\ns_amon-security_azure.git
+[2025-09-29 03:20:32] [INFO] Cloning wiki mirror: https:***@bitbucket.org/insidednymaic/ns_amon-security_azure.wiki.git → C:\PROJECT\scripts_git\bitbucket2github\.\work\ns_amon-security_azure.wiki.git
+[2025-09-29 03:20:32] [INFO] OK: ns_amon-security_azure
+[2025-09-29 03:20:32] [INFO] [RUN 29/46] ns_bj_azure → ViktorNikolayevIndyn/not.ns-bj-azure
+[2025-09-29 03:20:32] [INFO] Mirror exists → fetch: C:\PROJECT\scripts_git\bitbucket2github\.\work\ns_bj_azure.git
+[2025-09-29 03:20:33] [INFO] Rewriting @bots.bitbucket.org emails → vn@insidedynamic.de in C:\PROJECT\scripts_git\bitbucket2github\.\work\ns_bj_azure.git
+[2025-09-29 03:20:47] [INFO] Cloning wiki mirror: https:***@bitbucket.org/insidednymaic/ns_bj_azure.wiki.git → C:\PROJECT\scripts_git\bitbucket2github\.\work\ns_bj_azure.wiki.git
+[2025-09-29 03:20:48] [INFO] OK: ns_bj_azure
+[2025-09-29 03:20:48] [INFO] [RUN 30/46] ns_coffee-generator → ViktorNikolayevIndyn/not.ns-coffee-generator
+[2025-09-29 03:20:48] [INFO] Mirror exists → fetch: C:\PROJECT\scripts_git\bitbucket2github\.\work\ns_coffee-generator.git
+[2025-09-29 03:20:49] [INFO] Rewriting @bots.bitbucket.org emails → vn@insidedynamic.de in C:\PROJECT\scripts_git\bitbucket2github\.\work\ns_coffee-generator.git
+[2025-09-29 03:21:25] [INFO] Cloning wiki mirror: https:***@bitbucket.org/insidednymaic/ns_coffee-generator.wiki.git → C:\PROJECT\scripts_git\bitbucket2github\.\work\ns_coffee-generator.wiki.git
+[2025-09-29 03:21:26] [INFO] OK: ns_coffee-generator
+[2025-09-29 03:21:26] [INFO] [RUN 31/46] ns_essiyt-api_azre → ViktorNikolayevIndyn/not.ns-essiyt-api-azre
+[2025-09-29 03:21:26] [INFO] Mirror exists → fetch: C:\PROJECT\scripts_git\bitbucket2github\.\work\ns_essiyt-api_azre.git
+[2025-09-29 03:21:27] [INFO] Rewriting @bots.bitbucket.org emails → vn@insidedynamic.de in C:\PROJECT\scripts_git\bitbucket2github\.\work\ns_essiyt-api_azre.git
+[2025-09-29 03:24:22] [INFO] Cloning wiki mirror: https:***@bitbucket.org/insidednymaic/ns_essiyt-api_azre.wiki.git → C:\PROJECT\scripts_git\bitbucket2github\.\work\ns_essiyt-api_azre.wiki.git
+[2025-09-29 03:24:23] [INFO] OK: ns_essiyt-api_azre
+[2025-09-29 03:24:23] [INFO] [RUN 32/46] ns_freshcoffee → ViktorNikolayevIndyn/not.ns-freshcoffee
+[2025-09-29 03:24:23] [INFO] Mirror exists → fetch: C:\PROJECT\scripts_git\bitbucket2github\.\work\ns_freshcoffee.git
+[2025-09-29 03:24:24] [INFO] Rewriting @bots.bitbucket.org emails → vn@insidedynamic.de in C:\PROJECT\scripts_git\bitbucket2github\.\work\ns_freshcoffee.git
+[2025-09-29 03:26:38] [INFO] Cloning wiki mirror: https:***@bitbucket.org/insidednymaic/ns_freshcoffee.wiki.git → C:\PROJECT\scripts_git\bitbucket2github\.\work\ns_freshcoffee.wiki.git
+[2025-09-29 03:26:39] [INFO] OK: ns_freshcoffee
+[2025-09-29 03:26:39] [INFO] [RUN 33/46] ns_g12gv-site_azure → ViktorNikolayevIndyn/not.ns-g12gv-site-azure
+[2025-09-29 03:26:39] [INFO] Mirror exists → fetch: C:\PROJECT\scripts_git\bitbucket2github\.\work\ns_g12gv-site_azure.git
+[2025-09-29 03:26:40] [INFO] Rewriting @bots.bitbucket.org emails → vn@insidedynamic.de in C:\PROJECT\scripts_git\bitbucket2github\.\work\ns_g12gv-site_azure.git
+[2025-09-29 03:27:04] [INFO] Cloning wiki mirror: https:***@bitbucket.org/insidednymaic/ns_g12gv-site_azure.wiki.git → C:\PROJECT\scripts_git\bitbucket2github\.\work\ns_g12gv-site_azure.wiki.git
+[2025-09-29 03:27:05] [INFO] OK: ns_g12gv-site_azure
+[2025-09-29 03:27:05] [INFO] [RUN 34/46] ns_infido_azure → ViktorNikolayevIndyn/not.ns-infido-azure
+[2025-09-29 03:27:05] [INFO] Mirror exists → fetch: C:\PROJECT\scripts_git\bitbucket2github\.\work\ns_infido_azure.git
+[2025-09-29 03:27:06] [INFO] Rewriting @bots.bitbucket.org emails → vn@insidedynamic.de in C:\PROJECT\scripts_git\bitbucket2github\.\work\ns_infido_azure.git
+[2025-09-29 03:27:22] [INFO] Cloning wiki mirror: https:***@bitbucket.org/insidednymaic/ns_infido_azure.wiki.git → C:\PROJECT\scripts_git\bitbucket2github\.\work\ns_infido_azure.wiki.git
+[2025-09-29 03:27:23] [INFO] OK: ns_infido_azure
+[2025-09-29 03:27:23] [INFO] [RUN 35/46] ns_reab_center_azure → ViktorNikolayevIndyn/not.ns-reab-center-azure
+[2025-09-29 03:27:23] [INFO] Mirror exists → fetch: C:\PROJECT\scripts_git\bitbucket2github\.\work\ns_reab_center_azure.git
+[2025-09-29 03:27:24] [INFO] Rewriting @bots.bitbucket.org emails → vn@insidedynamic.de in C:\PROJECT\scripts_git\bitbucket2github\.\work\ns_reab_center_azure.git
+[2025-09-29 03:27:39] [INFO] Cloning wiki mirror: https:***@bitbucket.org/insidednymaic/ns_reab_center_azure.wiki.git → C:\PROJECT\scripts_git\bitbucket2github\.\work\ns_reab_center_azure.wiki.git
+[2025-09-29 03:27:40] [INFO] OK: ns_reab_center_azure
+[2025-09-29 03:27:40] [INFO] [RUN 36/46] ns_tatiana-blum_azure → ViktorNikolayevIndyn/not.ns-tatiana-blum-azure
+[2025-09-29 03:27:40] [INFO] Mirror exists → fetch: C:\PROJECT\scripts_git\bitbucket2github\.\work\ns_tatiana-blum_azure.git
+[2025-09-29 03:27:41] [INFO] Rewriting @bots.bitbucket.org emails → vn@insidedynamic.de in C:\PROJECT\scripts_git\bitbucket2github\.\work\ns_tatiana-blum_azure.git
+[2025-09-29 03:27:54] [INFO] Cloning wiki mirror: https:***@bitbucket.org/insidednymaic/ns_tatiana-blum_azure.wiki.git → C:\PROJECT\scripts_git\bitbucket2github\.\work\ns_tatiana-blum_azure.wiki.git
+[2025-09-29 03:27:54] [INFO] OK: ns_tatiana-blum_azure
+[2025-09-29 03:27:54] [INFO] [RUN 37/46] ns.mks → ViktorNikolayevIndyn/not.ns.mks
+[2025-09-29 03:27:54] [INFO] Mirror exists → fetch: C:\PROJECT\scripts_git\bitbucket2github\.\work\ns.mks.git
+[2025-09-29 03:27:55] [INFO] Rewriting @bots.bitbucket.org emails → vn@insidedynamic.de in C:\PROJECT\scripts_git\bitbucket2github\.\work\ns.mks.git
+[2025-09-29 03:28:15] [INFO] Cloning wiki mirror: https:***@bitbucket.org/insidednymaic/ns.mks.wiki.git → C:\PROJECT\scripts_git\bitbucket2github\.\work\ns.mks.wiki.git
+[2025-09-29 03:28:16] [INFO] OK: ns.mks
+[2025-09-29 03:28:16] [INFO] [RUN 38/46] oco-wako-app → ViktorNikolayevIndyn/oco.oco-wako-app
+[2025-09-29 03:28:16] [INFO] Mirror exists → fetch: C:\PROJECT\scripts_git\bitbucket2github\.\work\oco-wako-app.git
+[2025-09-29 03:28:17] [INFO] Rewriting @bots.bitbucket.org emails → vn@insidedynamic.de in C:\PROJECT\scripts_git\bitbucket2github\.\work\oco-wako-app.git
+[2025-09-29 03:28:32] [INFO] Cloning wiki mirror: https:***@bitbucket.org/insidednymaic/oco-wako-app.wiki.git → C:\PROJECT\scripts_git\bitbucket2github\.\work\oco-wako-app.wiki.git
+[2025-09-29 03:28:33] [INFO] OK: oco-wako-app
+[2025-09-29 03:28:33] [INFO] [RUN 39/46] php-api-echo → ViktorNikolayevIndyn/pae.php-api-echo
+[2025-09-29 03:28:33] [INFO] Mirror exists → fetch: C:\PROJECT\scripts_git\bitbucket2github\.\work\php-api-echo.git
+[2025-09-29 03:28:34] [INFO] Rewriting @bots.bitbucket.org emails → vn@insidedynamic.de in C:\PROJECT\scripts_git\bitbucket2github\.\work\php-api-echo.git
+[2025-09-29 03:28:48] [INFO] Cloning wiki mirror: https:***@bitbucket.org/insidednymaic/php-api-echo.wiki.git → C:\PROJECT\scripts_git\bitbucket2github\.\work\php-api-echo.wiki.git
+[2025-09-29 03:28:49] [INFO] OK: php-api-echo
+[2025-09-29 03:28:49] [INFO] [RUN 40/46] php-chatgpt-api → ViktorNikolayevIndyn/pae.php-chatgpt-api
+[2025-09-29 03:28:49] [INFO] Mirror exists → fetch: C:\PROJECT\scripts_git\bitbucket2github\.\work\php-chatgpt-api.git
+[2025-09-29 03:28:50] [INFO] Rewriting @bots.bitbucket.org emails → vn@insidedynamic.de in C:\PROJECT\scripts_git\bitbucket2github\.\work\php-chatgpt-api.git
+[2025-09-29 03:30:00] [INFO] Cloning wiki mirror: https:***@bitbucket.org/insidednymaic/php-chatgpt-api.wiki.git → C:\PROJECT\scripts_git\bitbucket2github\.\work\php-chatgpt-api.wiki.git
+[2025-09-29 03:30:01] [INFO] OK: php-chatgpt-api
+[2025-09-29 03:30:01] [INFO] [RUN 41/46] proxy.clinet.linkify → ViktorNikolayevIndyn/linkify.proxy.clinet.linkify
+[2025-09-29 03:30:01] [INFO] Mirror exists → fetch: C:\PROJECT\scripts_git\bitbucket2github\.\work\proxy.clinet.linkify.git
+[2025-09-29 03:30:04] [INFO] Rewriting @bots.bitbucket.org emails → vn@insidedynamic.de in C:\PROJECT\scripts_git\bitbucket2github\.\work\proxy.clinet.linkify.git
+[2025-09-29 03:30:21] [INFO] Cloning wiki mirror: https:***@bitbucket.org/insidednymaic/proxy.clinet.linkify.wiki.git → C:\PROJECT\scripts_git\bitbucket2github\.\work\proxy.clinet.linkify.wiki.git
+[2025-09-29 03:30:22] [INFO] OK: proxy.clinet.linkify
+[2025-09-29 03:30:22] [INFO] [RUN 42/46] safemybike → ViktorNikolayevIndyn/wast.safemybike
+[2025-09-29 03:30:22] [INFO] Mirror exists → fetch: C:\PROJECT\scripts_git\bitbucket2github\.\work\safemybike.git
+[2025-09-29 03:30:23] [INFO] Rewriting @bots.bitbucket.org emails → vn@insidedynamic.de in C:\PROJECT\scripts_git\bitbucket2github\.\work\safemybike.git
+[2025-09-29 03:30:35] [INFO] Cloning wiki mirror: https:***@bitbucket.org/insidednymaic/safemybike.wiki.git → C:\PROJECT\scripts_git\bitbucket2github\.\work\safemybike.wiki.git
+[2025-09-29 03:30:36] [INFO] OK: safemybike
+[2025-09-29 03:30:36] [INFO] [RUN 43/46] safemylife → ViktorNikolayevIndyn/wast.safemylife
+[2025-09-29 03:30:36] [INFO] Mirror exists → fetch: C:\PROJECT\scripts_git\bitbucket2github\.\work\safemylife.git
+[2025-09-29 03:30:37] [INFO] Rewriting @bots.bitbucket.org emails → vn@insidedynamic.de in C:\PROJECT\scripts_git\bitbucket2github\.\work\safemylife.git
+[2025-09-29 03:30:51] [INFO] Cloning wiki mirror: https:***@bitbucket.org/insidednymaic/safemylife.wiki.git → C:\PROJECT\scripts_git\bitbucket2github\.\work\safemylife.wiki.git
+[2025-09-29 03:30:51] [INFO] OK: safemylife
+[2025-09-29 03:30:51] [INFO] [RUN 44/46] scamscan-web → ViktorNikolayevIndyn/scam.scamscan-web
+[2025-09-29 03:30:51] [INFO] Mirror exists → fetch: C:\PROJECT\scripts_git\bitbucket2github\.\work\scamscan-web.git
+[2025-09-29 03:30:52] [INFO] Rewriting @bots.bitbucket.org emails → vn@insidedynamic.de in C:\PROJECT\scripts_git\bitbucket2github\.\work\scamscan-web.git
+[2025-09-29 03:31:23] [INFO] Cloning wiki mirror: https:***@bitbucket.org/insidednymaic/scamscan-web.wiki.git → C:\PROJECT\scripts_git\bitbucket2github\.\work\scamscan-web.wiki.git
+[2025-09-29 03:31:24] [INFO] OK: scamscan-web
+[2025-09-29 03:31:24] [INFO] [RUN 45/46] scmscan_mobapp → ViktorNikolayevIndyn/scam.scmscan-mobapp
+[2025-09-29 03:31:24] [INFO] Mirror exists → fetch: C:\PROJECT\scripts_git\bitbucket2github\.\work\scmscan_mobapp.git
+[2025-09-29 03:31:25] [INFO] Rewriting @bots.bitbucket.org emails → vn@insidedynamic.de in C:\PROJECT\scripts_git\bitbucket2github\.\work\scmscan_mobapp.git
+[2025-09-29 03:31:37] [INFO] Cloning wiki mirror: https:***@bitbucket.org/insidednymaic/scmscan_mobapp.wiki.git → C:\PROJECT\scripts_git\bitbucket2github\.\work\scmscan_mobapp.wiki.git
+[2025-09-29 03:31:38] [INFO] OK: scmscan_mobapp
+[2025-09-29 03:31:38] [INFO] [RUN 46/46] shop.woocommerce.freshcoffee → ViktorNikolayevIndyn/web.shop.woocommerce.freshcoffee
+[2025-09-29 03:31:38] [INFO] Mirror exists → fetch: C:\PROJECT\scripts_git\bitbucket2github\.\work\shop.woocommerce.freshcoffee.git
+[2025-09-29 03:31:39] [INFO] Rewriting @bots.bitbucket.org emails → vn@insidedynamic.de in C:\PROJECT\scripts_git\bitbucket2github\.\work\shop.woocommerce.freshcoffee.git
+[2025-09-29 03:33:51] [INFO] Cloning wiki mirror: https:***@bitbucket.org/insidednymaic/shop.woocommerce.freshcoffee.wiki.git → C:\PROJECT\scripts_git\bitbucket2github\.\work\shop.woocommerce.freshcoffee.wiki.git
+[2025-09-29 03:33:52] [INFO] OK: shop.woocommerce.freshcoffee
+[2025-09-29 03:33:52] [INFO] === BB2GH DONE ===
