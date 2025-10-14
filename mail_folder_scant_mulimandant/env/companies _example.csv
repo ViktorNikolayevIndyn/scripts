@@ -1,0 +1,5 @@
+name;emailto;attachment;active;credname;folderpath;senderupn;pathuser;pathpassenv
+JOST1;ap@jost.de;true;false;default;C:\Scans\incoming\jost;;;
+ACME;ap@acme.com,boss@acme.com;true;false;default;\\FS01\Scans\ACME;;;
+VIKTOR1;viktor.nikolayev+scan1@gmail.com;true;true;default;C:\Scans\VIKTOR;;;
+VIKTOR2;viktor.nikolayev+scan2@gmail.com;true;true;default;C:\Scans\JOST;;;

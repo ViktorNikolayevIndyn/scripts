@@ -223,11 +223,17 @@ function Build-Work([object[]]$Companies,[hashtable]$Graph){
   $work=@()
   foreach($c in $Companies){
     if(-not (Parse-Bool $c.Active)){ Write-Info "Skip inactive: $($c.Name)"; continue }
-    if(-not (Test-DirSafe $c.FolderPath)){ Write-Info "Skip no folder: $($c.Name)"; continue }
     if(-not $c.SendTo -or $c.SendTo.Count -eq 0){ Write-Info "Skip no recipients: $($c.Name)"; continue }
 
-    $files = Collect-Files $c.FolderPath $Graph.AllowedExt
+    # NEW: UNC login (если заданы креды в любом виде)
+    $cred = Resolve-UncCred $c
+    if($cred.User -and $cred.Password){
+      Ensure-UncLogin $c.FolderPath $cred.User $cred.Password
+    }
 
+    if(-not (Test-DirSafe $c.FolderPath)){ Write-Info "Skip no folder: $($c.Name)"; continue }
+
+    $files = Collect-Files $c.FolderPath $Graph.AllowedExt
     if($files.Count -eq 0){
       if(-not (Parse-Bool $c.Attachment)){
         Write-Info "Queue message-only: $($c.Name)"
@@ -242,6 +248,7 @@ function Build-Work([object[]]$Companies,[hashtable]$Graph){
   }
   $work
 }
+
 
 # NEW: извлечь роли (app permissions) из токена
 function Get-TokenRoles([string]$Jwt){
@@ -330,4 +337,78 @@ function Send-ScanMail {
 
     $size = Format-Size $fi.Length
     Write-Host ("[{0}] {1} -> {2} ({3}) - OK" -f (Get-Date -Format s), $fi.Name, $To, $size)
+}
+
+
+# --- UNC helper: кэш подключений
+$script:UncLogins = @{}
+
+function Get-PlainFromEnv([string]$EnvVarName){
+  if([string]::IsNullOrWhiteSpace($EnvVarName)){ return $null }
+  $v = [Environment]::GetEnvironmentVariable($EnvVarName,'Process')
+  if([string]::IsNullOrWhiteSpace($v)){ $v = [Environment]::GetEnvironmentVariable($EnvVarName,'User') }
+  if([string]::IsNullOrWhiteSpace($v)){ $v = [Environment]::GetEnvironmentVariable($EnvVarName,'Machine') }
+  if([string]::IsNullOrWhiteSpace($v)){
+    throw "Env var '$EnvVarName' not found."
+  }
+  return $v
+}
+
+function Get-UncShareRoot([string]$Path){
+  if(-not $Path.StartsWith('\\')){ return $null }
+  $p = $Path.TrimEnd('\')
+  $parts = $p.Split('\') | Where-Object { $_ -ne '' }
+  if($parts.Count -lt 2){ return $null }
+  return "\\$($parts[0])\$($parts[1])"
+}
+
+function Resolve-UncCred($company){
+  # приоритет: pathuserenv -> pathuser
+  $user = $null
+  if($company.PSObject.Properties.Name -contains 'pathuserenv' -and -not [string]::IsNullOrWhiteSpace($company.pathuserenv)){
+    $user = Get-PlainFromEnv $company.pathuserenv
+  } elseif($company.PSObject.Properties.Name -contains 'pathuser' -and -not [string]::IsNullOrWhiteSpace($company.pathuser)){
+    $user = $company.pathuser
+  }
+
+  $pwd = $null
+  if($company.PSObject.Properties.Name -contains 'pathpassenv' -and -not [string]::IsNullOrWhiteSpace($company.pathpassenv)){
+    $pwd = Get-PlainFromEnv $company.pathpassenv
+  }
+
+  return [pscustomobject]@{ User=$user; Password=$pwd }
+}
+
+function Ensure-UncLogin([string]$Path,[string]$User,[string]$Password){
+  if([string]::IsNullOrWhiteSpace($User) -or [string]::IsNullOrWhiteSpace($Password)){ return }
+  if(-not $Path.StartsWith('\\')){ return } # не UNC
+
+  $root = Get-UncShareRoot $Path
+  if([string]::IsNullOrWhiteSpace($root)){ return }
+
+  if($script:UncLogins.ContainsKey($root)){ return } # уже логинились
+
+  try{
+    cmd /c "net use $root /delete /y" | Out-Null 2>$null | Out-Null
+
+    $pinfo = New-Object System.Diagnostics.ProcessStartInfo
+    $pinfo.FileName  = "cmd.exe"
+    $pinfo.Arguments = "/c net use `"$root`" /user:`"$User`" `"$Password`" /persistent:no"
+    $pinfo.RedirectStandardError = $true
+    $pinfo.RedirectStandardOutput = $true
+    $pinfo.UseShellExecute = $false
+    $p = [System.Diagnostics.Process]::Start($pinfo)
+    $p.WaitForExit()
+
+    if($p.ExitCode -ne 0){
+      $err = $p.StandardError.ReadToEnd() + $p.StandardOutput.ReadToEnd()
+      throw "net use failed ($($p.ExitCode)): $err"
+    }
+
+    $script:UncLogins[$root] = $true
+    Write-Info "UNC login OK: $root as $User"
+  } catch {
+    Write-Info "UNC login FAILED: $root as $User ($($_.Exception.Message))"
+    throw
+  }
 }
