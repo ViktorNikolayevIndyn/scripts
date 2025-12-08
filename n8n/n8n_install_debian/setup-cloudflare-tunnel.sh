@@ -169,6 +169,30 @@ if [ "$USE_API" = true ] && [ -n "$CF_API_TOKEN" ]; then
     log "Account ID: $CF_ACCOUNT_ID"
     success "✓ API authentication successful"
     
+    # Check tunnel permissions
+    log "Verifying tunnel permissions..."
+    TUNNEL_PERMS_CHECK=$(curl -s -X GET "https://api.cloudflare.com/client/v4/accounts/$CF_ACCOUNT_ID/cfd_tunnel" \
+        -H "Authorization: Bearer $CF_API_TOKEN" \
+        -H "Content-Type: application/json")
+    
+    PERMS_SUCCESS=$(echo "$TUNNEL_PERMS_CHECK" | jq -r '.success // false')
+    
+    if [ "$PERMS_SUCCESS" != "true" ]; then
+        error "API Token does not have Cloudflare Tunnel permissions"
+        echo ""
+        echo "Please create a new API Token with these permissions:"
+        echo "  1. Go to: https://dash.cloudflare.com/profile/api-tokens"
+        echo "  2. Create Token → Custom Token"
+        echo "  3. Add permissions:"
+        echo "     • Account → Cloudflare Tunnel → Edit"
+        echo "     • Zone → DNS → Edit"
+        echo "  4. Save the token and run this script again"
+        echo ""
+        exit 1
+    fi
+    
+    success "✓ Tunnel permissions verified"
+    
 elif [ "$AUTH_METHOD" = "2" ]; then
     # Browser login method
     if [ ! -f "$CONFIG_DIR/cert.pem" ]; then
