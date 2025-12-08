@@ -93,6 +93,19 @@ echo ""
 
 bash setup.sh
 
+# Copy setup-cloudflare-tunnel.sh to /opt/n8n if it exists
+if [ -f "$WORK_DIR/setup-cloudflare-tunnel.sh" ] && [ -d "$INSTALL_DIR" ]; then
+    log "Copying setup-cloudflare-tunnel.sh to $INSTALL_DIR..."
+    cp "$WORK_DIR/setup-cloudflare-tunnel.sh" "$INSTALL_DIR/"
+    chmod +x "$INSTALL_DIR/setup-cloudflare-tunnel.sh"
+    
+    # Get n8n user from setup.sh or default
+    N8N_USER=$(grep "^N8N_USER=" "$WORK_DIR/setup.sh" 2>/dev/null | cut -d'"' -f2 || echo "n8nuser")
+    chown "$N8N_USER":"$N8N_USER" "$INSTALL_DIR/setup-cloudflare-tunnel.sh" 2>/dev/null || true
+    
+    success "setup-cloudflare-tunnel.sh copied to $INSTALL_DIR"
+fi
+
 # Cleanup
 cd /
 rm -rf "$WORK_DIR"
