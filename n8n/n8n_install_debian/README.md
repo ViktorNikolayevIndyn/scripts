@@ -24,8 +24,10 @@
 ### One-Line Installation
 
 ```bash
-bash -c "$(curl -fsSL https://raw.githubusercontent.com/ViktorNikolayevIndyn/scripts/main/n8n/install.sh)"
+bash -c "$(curl -fsSL 'https://raw.githubusercontent.com/ViktorNikolayevIndyn/scripts/main/n8n/install.sh?t='$(date +%s))"
 ```
+
+> **Note:** The `?t=$(date +%s)` parameter bypasses GitHub's cache to ensure you get the latest version.
 
 **That's it!** The script will:
 1. ✅ Install all dependencies (Docker, Cloudflared, etc.)
@@ -100,14 +102,19 @@ docker compose restart
 After main installation, configure Cloudflare Tunnel:
 
 ```bash
+bash <(curl -fsSL 'https://raw.githubusercontent.com/ViktorNikolayevIndyn/scripts/main/n8n/n8n_install_debian/setup-cloudflare-tunnel.sh?t='$(date +%s))
+```
+
+Or if already downloaded:
+```bash
 cd /opt/n8n
 bash setup-cloudflare-tunnel.sh
 ```
 
 The script will:
-1. Authenticate with Cloudflare (opens browser)
-2. Create tunnel
-3. Configure DNS record
+1. Use saved Cloudflare API Token (or prompt for new one)
+2. Create or reuse existing tunnel
+3. Configure DNS record via API
 4. Set up systemd service
 
 **Alternative**: Manual tunnel setup via [Cloudflare Dashboard](https://one.dash.cloudflare.com/)
