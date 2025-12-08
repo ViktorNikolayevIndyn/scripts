@@ -43,7 +43,7 @@ services:
       postgres:
         condition: service_healthy
     networks:
-      - n8n-network
+      - n8nnetwork
 
 volumes:
   n8n-data:
@@ -52,5 +52,5 @@ volumes:
     driver: local
 
 networks:
-  n8n-network:
+  n8nnetwork:
     driver: bridge
