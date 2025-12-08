@@ -366,27 +366,11 @@ fi
 
 TUNNEL_TARGET="$TUNNEL_ID.cfargotunnel.com"
 
-# Method 1: Try cloudflared tunnel route dns
-log "Attempting automatic DNS configuration via cloudflared..."
-DNS_OUTPUT=$("$CLOUDFLARED_BIN" tunnel route dns "$TUNNEL_NAME" "$DOMAIN" 2>&1)
-
-if echo "$DNS_OUTPUT" | grep -q -E '(created|already exists|Successfully)'; then
-    success "DNS record configured for $DOMAIN"
-elif echo "$DNS_OUTPUT" | grep -q "already exists"; then
-    log "DNS record already exists"
+# Configure DNS based on authentication method
+if [ "$USE_API" = true ]; then
+    # Method: Use Cloudflare API directly
+    log "Configuring DNS via Cloudflare API..."
     
-    # Ask if user wants to update via API (if not already using API auth)
-    if [ "$USE_API" = false ]; then
-        echo ""
-        read -p "Update DNS record via Cloudflare API? [y/N]: " USE_DNS_API
-        
-        if [[ "$USE_DNS_API" =~ ^[Yy]$ ]]; then
-            # Method 2: Use Cloudflare API
-            read -p "Enter Cloudflare API Token (with DNS edit permissions): " CF_API_TOKEN
-        fi
-    fi
-    
-    # Use API if enabled (either from tunnel auth or DNS-only)
     if [ -n "$CF_API_TOKEN" ]; then
             log "Fetching Zone ID for $ROOT_DOMAIN..."
             
@@ -438,22 +422,29 @@ elif echo "$DNS_OUTPUT" | grep -q "already exists"; then
                     fi
                 fi
             fi
-        fi
     else
-        success "Keeping existing DNS configuration"
+        warning "No API token available for DNS configuration"
     fi
 else
-    warning "Could not automatically configure DNS"
-    log "DNS output: $DNS_OUTPUT"
-    echo ""
-    echo "⚠️  Please configure DNS manually:"
-    echo "   1. Go to Cloudflare Dashboard → DNS"
-    echo "   2. Add/Update CNAME record:"
-    echo "      Name: $SUBDOMAIN"
-    echo "      Target: $TUNNEL_TARGET"
-    echo "      Proxy: Enabled (orange cloud)"
-    echo ""
-    read -p "Press Enter when DNS is configured..."
+    # Method: Use cloudflared CLI (requires cert.pem)
+    log "Attempting automatic DNS configuration via cloudflared..."
+    DNS_OUTPUT=$("$CLOUDFLARED_BIN" tunnel route dns "$TUNNEL_NAME" "$DOMAIN" 2>&1)
+
+    if echo "$DNS_OUTPUT" | grep -q -E '(created|already exists|Successfully)'; then
+        success "DNS record configured for $DOMAIN"
+    else
+        warning "Could not automatically configure DNS via cloudflared"
+        log "DNS output: $DNS_OUTPUT"
+        echo ""
+        echo "⚠️  Please configure DNS manually:"
+        echo "   1. Go to Cloudflare Dashboard → DNS"
+        echo "   2. Add/Update CNAME record:"
+        echo "      Name: $SUBDOMAIN"
+        echo "      Target: $TUNNEL_TARGET"
+        echo "      Proxy: Enabled (orange cloud)"
+        echo ""
+        read -p "Press Enter when DNS is configured..."
+    fi
 fi
 
 # ⚙️ Create systemd service
