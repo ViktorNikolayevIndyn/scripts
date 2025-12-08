@@ -184,12 +184,61 @@ mkdir -p "$N8N_DIR"
 cd "$N8N_DIR"
 
 # Generate config if not exists
-CONFIG_SCRIPT="$(dirname "$0")/generate-config.sh"
 if [[ ! -f "$N8N_DIR/.env" ]]; then
+    CONFIG_SCRIPT="$(dirname "$0")/generate-config.sh"
+    
+    # Try to find generate-config.sh
+    if [[ ! -f "$CONFIG_SCRIPT" ]]; then
+        # Try in current directory
+        if [[ -f "./generate-config.sh" ]]; then
+            CONFIG_SCRIPT="./generate-config.sh"
+        # Try in /tmp
+        elif [[ -f "/tmp/generate-config.sh" ]]; then
+            CONFIG_SCRIPT="/tmp/generate-config.sh"
+        # Try in script's directory by finding setup.sh
+        elif [[ -f "$(pwd)/generate-config.sh" ]]; then
+            CONFIG_SCRIPT="$(pwd)/generate-config.sh"
+        fi
+    fi
+    
     if [[ -f "$CONFIG_SCRIPT" ]]; then
         bash "$CONFIG_SCRIPT" || error_exit "Configuration generation failed"
     else
-        error_exit "generate-config.sh not found"
+        log "⚠ generate-config.sh not found, creating basic configuration..."
+        
+        # Interactive fallback
+        read -p "Enter n8n hostname (e.g., n8n.example.com): " N8N_HOSTNAME
+        read -p "Enter Basic Auth username [admin]: " N8N_AUTH_USER
+        N8N_AUTH_USER=${N8N_AUTH_USER:-admin}
+        read -s -p "Enter Basic Auth password: " N8N_AUTH_PASS
+        echo ""
+        
+        if [[ -z "$N8N_AUTH_PASS" ]]; then
+            N8N_AUTH_PASS=$(openssl rand -base64 32 | tr -d "=+/" | cut -c1-25)
+            log "Generated password: $N8N_AUTH_PASS"
+        fi
+        
+        # Create .env file
+        cat > "$N8N_DIR/.env" <<EOF
+# n8n Configuration
+N8N_HOST=${N8N_HOSTNAME}
+N8N_PORT=80
+N8N_PROTOCOL=https
+N8N_BASIC_AUTH_ACTIVE=true
+N8N_BASIC_AUTH_USER=${N8N_AUTH_USER}
+N8N_BASIC_AUTH_PASSWORD=${N8N_AUTH_PASS}
+
+# Database Configuration
+POSTGRES_USER=n8n
+POSTGRES_PASSWORD=$(openssl rand -base64 32 | tr -d "=+/" | cut -c1-25)
+POSTGRES_DB=n8n
+
+# Timezone
+GENERIC_TIMEZONE=Europe/Berlin
+TZ=Europe/Berlin
+EOF
+        chmod 600 "$N8N_DIR/.env"
+        log "✓ Configuration created at $N8N_DIR/.env"
     fi
 else
     log "✓ Configuration file already exists"
