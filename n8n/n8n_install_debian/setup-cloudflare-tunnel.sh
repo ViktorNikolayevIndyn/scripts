@@ -145,14 +145,16 @@ if [ "$USE_API" = true ] && [ -n "$CF_API_TOKEN" ]; then
         -H "Authorization: Bearer $CF_API_TOKEN" \
         -H "Content-Type: application/json")
     
-    CF_ACCOUNT_ID=$(echo "$ACCOUNTS_RESPONSE" | jq -r '.result[0].id // empty')
-    ACCOUNT_NAME=$(echo "$ACCOUNTS_RESPONSE" | jq -r '.result[0].name // empty')
+    API_SUCCESS=$(echo "$ACCOUNTS_RESPONSE" | jq -r '.success // false')
     
-    if [ -z "$CF_ACCOUNT_ID" ]; then
+    if [ "$API_SUCCESS" != "true" ]; then
         error "Could not fetch account ID. Check your API token permissions."
-        echo "Response: $ACCOUNTS_RESPONSE"
+        echo "$ACCOUNTS_RESPONSE" | jq '.'
         exit 1
     fi
+    
+    CF_ACCOUNT_ID=$(echo "$ACCOUNTS_RESPONSE" | jq -r '.result[0].id // empty')
+    ACCOUNT_NAME=$(echo "$ACCOUNTS_RESPONSE" | jq -r '.result[0].name // empty')
     
     log "Account: $ACCOUNT_NAME"
     log "Account ID: $CF_ACCOUNT_ID"

@@ -63,14 +63,16 @@ case $OPTION in
                 -H "Authorization: Bearer $TOKEN" \
                 -H "Content-Type: application/json")
             
-            ACCOUNT_ID=$(echo "$ACCOUNTS_RESPONSE" | jq -r '.result[0].id // empty')
-            ACCOUNT_NAME=$(echo "$ACCOUNTS_RESPONSE" | jq -r '.result[0].name // empty')
+            API_SUCCESS=$(echo "$ACCOUNTS_RESPONSE" | jq -r '.success // false')
             
-            if [ -z "$ACCOUNT_ID" ]; then
+            if [ "$API_SUCCESS" != "true" ]; then
                 error "Could not fetch account information"
-                echo "Response: $ACCOUNTS_RESPONSE" | jq '.'
+                echo "$ACCOUNTS_RESPONSE" | jq '.'
                 exit 1
             fi
+            
+            ACCOUNT_ID=$(echo "$ACCOUNTS_RESPONSE" | jq -r '.result[0].id // empty')
+            ACCOUNT_NAME=$(echo "$ACCOUNTS_RESPONSE" | jq -r '.result[0].name // empty')
             
             # Verify token using account-specific endpoint
             TEST_RESPONSE=$(curl -s -X GET "https://api.cloudflare.com/client/v4/accounts/$ACCOUNT_ID/tokens/verify" \
@@ -105,15 +107,15 @@ case $OPTION in
                 -H "Authorization: Bearer $NEW_TOKEN" \
                 -H "Content-Type: application/json")
             
-            ACCOUNT_ID=$(echo "$ACCOUNTS_RESPONSE" | jq -r '.result[0].id // empty')
+            API_SUCCESS=$(echo "$ACCOUNTS_RESPONSE" | jq -r '.success // false')
             
-            if [ -n "$ACCOUNT_ID" ]; then
+            if [ "$API_SUCCESS" = "true" ]; then
                 echo "$NEW_TOKEN" > "$API_TOKEN_FILE"
                 chmod 600 "$API_TOKEN_FILE"
                 success "Token saved to $API_TOKEN_FILE"
             else
                 error "Token verification failed"
-                echo "Response: $ACCOUNTS_RESPONSE" | jq '.'
+                echo "$ACCOUNTS_RESPONSE" | jq '.'
                 exit 1
             fi
         fi
@@ -139,15 +141,15 @@ case $OPTION in
                 -H "Authorization: Bearer $NEW_TOKEN" \
                 -H "Content-Type: application/json")
             
-            ACCOUNT_ID=$(echo "$ACCOUNTS_RESPONSE" | jq -r '.result[0].id // empty')
+            API_SUCCESS=$(echo "$ACCOUNTS_RESPONSE" | jq -r '.success // false')
             
-            if [ -n "$ACCOUNT_ID" ]; then
+            if [ "$API_SUCCESS" = "true" ]; then
                 echo "$NEW_TOKEN" > "$API_TOKEN_FILE"
                 chmod 600 "$API_TOKEN_FILE"
                 success "Token updated"
             else
                 error "Token verification failed"
-                echo "Response: $ACCOUNTS_RESPONSE" | jq '.'
+                echo "$ACCOUNTS_RESPONSE" | jq '.'
                 exit 1
             fi
         else
