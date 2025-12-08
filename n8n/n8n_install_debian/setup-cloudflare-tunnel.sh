@@ -100,6 +100,29 @@ if [ "$AUTH_METHOD" = "1" ]; then
         exit 1
     fi
     
+    # Test API connection
+    log "Testing API connection..."
+    TEST_RESPONSE=$(curl -s -w "\n%{http_code}" -X GET "https://api.cloudflare.com/client/v4/user/tokens/verify" \
+        -H "Authorization: Bearer $CF_API_TOKEN" \
+        -H "Content-Type: application/json")
+    
+    HTTP_CODE=$(echo "$TEST_RESPONSE" | tail -n1)
+    TEST_BODY=$(echo "$TEST_RESPONSE" | head -n-1)
+    
+    if [ "$HTTP_CODE" != "200" ]; then
+        error "API Token verification failed (HTTP $HTTP_CODE)"
+        echo "Response: $TEST_BODY"
+        exit 1
+    fi
+    
+    TOKEN_STATUS=$(echo "$TEST_BODY" | jq -r '.result.status // empty')
+    if [ "$TOKEN_STATUS" != "active" ]; then
+        error "API Token is not active (status: $TOKEN_STATUS)"
+        exit 1
+    fi
+    
+    success "✓ API Token verified successfully"
+    
     # Get Account ID
     log "Fetching account information..."
     ACCOUNTS_RESPONSE=$(curl -s -X GET "https://api.cloudflare.com/client/v4/accounts" \
@@ -107,6 +130,7 @@ if [ "$AUTH_METHOD" = "1" ]; then
         -H "Content-Type: application/json")
     
     CF_ACCOUNT_ID=$(echo "$ACCOUNTS_RESPONSE" | jq -r '.result[0].id // empty')
+    ACCOUNT_NAME=$(echo "$ACCOUNTS_RESPONSE" | jq -r '.result[0].name // empty')
     
     if [ -z "$CF_ACCOUNT_ID" ]; then
         error "Could not fetch account ID. Check your API token permissions."
@@ -114,8 +138,9 @@ if [ "$AUTH_METHOD" = "1" ]; then
         exit 1
     fi
     
+    log "Account: $ACCOUNT_NAME"
     log "Account ID: $CF_ACCOUNT_ID"
-    success "API authentication successful"
+    success "✓ API authentication successful"
     
 elif [ "$AUTH_METHOD" = "2" ]; then
     # Browser login method
@@ -151,6 +176,41 @@ elif [ "$AUTH_METHOD" = "2" ]; then
 else
     error "Invalid selection"
     exit 1
+fi
+
+# 🧹 Check and remove old cloudflared service
+echo ""
+log "Checking for old cloudflared services..."
+
+OLD_SERVICES=("cloudflared" "cloudflared.service")
+SERVICES_REMOVED=false
+
+for SERVICE_NAME in "${OLD_SERVICES[@]}"; do
+    if systemctl list-units --full --all | grep -q "$SERVICE_NAME"; then
+        warning "Found old service: $SERVICE_NAME"
+        log "Stopping $SERVICE_NAME..."
+        systemctl stop "$SERVICE_NAME" 2>/dev/null || true
+        log "Disabling $SERVICE_NAME..."
+        systemctl disable "$SERVICE_NAME" 2>/dev/null || true
+        
+        # Remove service file
+        SERVICE_FILE="/etc/systemd/system/$SERVICE_NAME"
+        if [ -f "$SERVICE_FILE" ]; then
+            log "Removing $SERVICE_FILE..."
+            rm -f "$SERVICE_FILE"
+            SERVICES_REMOVED=true
+        fi
+        
+        success "✓ Removed old service: $SERVICE_NAME"
+    fi
+done
+
+if [ "$SERVICES_REMOVED" = true ]; then
+    log "Reloading systemd daemon..."
+    systemctl daemon-reload
+    success "✓ Old services cleaned up"
+else
+    log "No old cloudflared services found"
 fi
 
 # 📥 Input
