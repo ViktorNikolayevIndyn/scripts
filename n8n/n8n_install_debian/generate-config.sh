@@ -99,7 +99,9 @@ read -p "🌍 Timezone [Europe/Berlin]: " TIMEZONE
 TIMEZONE=${TIMEZONE:-Europe/Berlin}
 
 # Create .env file
-log "Creating .env file..."
+log "Creating .env file at: $ENV_FILE"
+log "Target directory: $CONFIG_DIR"
+log "N8N_DIR variable: ${N8N_DIR:-not set}"
 
 cat > "$ENV_FILE" <<EOF
 # n8n Configuration
@@ -149,5 +151,11 @@ echo "=========================================="
 echo ""
 warning "IMPORTANT: Save these credentials securely!"
 echo ""
-echo "Configuration file: $ENV_FILE"
+echo "Configuration saved to: $ENV_FILE"
 echo ""
+
+# Verify file was created
+if [[ ! -f "$ENV_FILE" ]]; then
+    echo "ERROR: Failed to create $ENV_FILE"
+    exit 1
+fi

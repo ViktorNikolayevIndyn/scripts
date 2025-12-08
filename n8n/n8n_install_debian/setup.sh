@@ -248,6 +248,11 @@ else
     log "✓ Configuration file already exists"
 fi
 
+# Verify .env file exists before loading
+if [[ ! -f "$N8N_DIR/.env" ]]; then
+    error_exit ".env file not found at $N8N_DIR/.env"
+fi
+
 # Load configuration
 source "$N8N_DIR/.env"
 log "✓ Configuration loaded"
