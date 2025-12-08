@@ -382,8 +382,23 @@ else
                 fi
             done
             success "Old tunnel(s) deleted"
-            log "Waiting 3 seconds for Cloudflare API to propagate changes..."
-            sleep 3
+            log "Waiting for Cloudflare API to propagate deletion..."
+            
+            # Wait up to 15 seconds for tunnels to be fully deleted
+            for i in {1..5}; do
+                sleep 3
+                CHECK_TUNNELS=$(curl -s "https://api.cloudflare.com/client/v4/accounts/$CF_ACCOUNT_ID/cfd_tunnel?name=$TUNNEL_NAME" \
+                    -H "Authorization: Bearer $CF_API_TOKEN" | jq -r '.result[]?.id // empty')
+                
+                if [ -z "$CHECK_TUNNELS" ]; then
+                    success "Tunnels fully deleted"
+                    break
+                fi
+                
+                if [ $i -eq 5 ]; then
+                    warning "Tunnels still exist after 15 seconds, proceeding anyway..."
+                fi
+            done
         else
             log "Using first existing tunnel..."
             TUNNEL_ID=$(echo "$EXISTING_TUNNEL_IDS" | head -n1)
