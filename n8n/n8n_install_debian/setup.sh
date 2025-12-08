@@ -1,10 +1,11 @@
 #!/bin/bash
 #
-# n8n One-Click Setup Script with Cloudflare Tunnel
+# n8n One-Click Setup Script
 # Debian 12/13 only
 # 
 # Usage: bash setup.sh
-# Optional: export CLOUDFLARE_TUNNEL_TOKEN="your-token" before running
+#
+# Note: Cloudflare Tunnel setup is now a separate step after installation
 #
 
 set -e  # Exit on error
@@ -57,7 +58,7 @@ check_debian() {
 # ============================================================================
 clear
 echo "=========================================="
-echo "  n8n Server Setup with Cloudflare Tunnel"
+echo "  n8n Server Setup - Debian 12/13"
 echo "=========================================="
 echo ""
 
@@ -399,52 +400,9 @@ chown -R "$N8N_USER":"$N8N_USER" "$N8N_DIR"
 log "✓ n8n configuration complete"
 
 # ============================================================================
-# 7. Cloudflare Tunnel (cloudflared)
+# 7. Start n8n Services
 # ============================================================================
-log "Step 7: Installing and configuring Cloudflare Tunnel..."
-
-# Check for tunnel token
-if [[ -z "$CLOUDFLARE_TUNNEL_TOKEN" ]]; then
-    read -p "Enter Cloudflare Tunnel Token: " CLOUDFLARE_TUNNEL_TOKEN
-fi
-
-if [[ -z "$CLOUDFLARE_TUNNEL_TOKEN" ]]; then
-    error_exit "Cloudflare Tunnel Token is required"
-fi
-
-# Install cloudflared
-curl -L --output /usr/local/bin/cloudflared https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64
-chmod +x /usr/local/bin/cloudflared
-
-# Create cloudflared systemd service
-cat > /etc/systemd/system/cloudflared.service <<EOF
-[Unit]
-Description=Cloudflare Tunnel
-After=network.target
-
-[Service]
-Type=simple
-User=root
-ExecStart=/usr/local/bin/cloudflared tunnel --no-autoupdate run --token ${CLOUDFLARE_TUNNEL_TOKEN}
-Restart=on-failure
-RestartSec=5s
-
-[Install]
-WantedBy=multi-user.target
-EOF
-
-# Enable and start cloudflared
-systemctl daemon-reload
-systemctl enable cloudflared >> "$LOGFILE" 2>&1
-systemctl start cloudflared >> "$LOGFILE" 2>&1
-
-sleep 3
-log "✓ Cloudflare Tunnel configured and running"
-
-# ============================================================================
-# 8. Start n8n Services
-# ============================================================================
-log "Step 8: Starting n8n Docker services..."
+log "Step 7: Starting n8n Docker services..."
 
 cd "$N8N_DIR"
 docker compose up -d >> "$LOGFILE" 2>&1 || error_exit "Failed to start n8n containers"
@@ -453,9 +411,9 @@ sleep 5
 log "✓ n8n containers started"
 
 # ============================================================================
-# 9. Create systemd service for n8n auto-start
+# 8. Create systemd service for n8n auto-start
 # ============================================================================
-log "Step 9: Creating systemd service for n8n auto-start..."
+log "Step 8: Creating systemd service for n8n auto-start..."
 
 cat > /etc/systemd/system/n8n-docker.service <<EOF
 [Unit]
@@ -503,31 +461,48 @@ echo "Docker Containers:"
 docker ps | tee -a "$LOGFILE"
 echo ""
 
-echo "Cloudflare Tunnel Status:"
-systemctl status cloudflared --no-pager | tee -a "$LOGFILE"
+echo "=========================================="
+echo "  ✅ Installation Complete!"
+echo "=========================================="
 echo ""
-
-echo "=========================================="
-echo "  Access Information"
-echo "=========================================="
-echo "n8n URL: https://${N8N_HOST}"
-echo "Username: ${N8N_BASIC_AUTH_USER}"
-echo "Password: ${N8N_BASIC_AUTH_PASSWORD}"
+echo "n8n is running locally on: http://localhost:${N8N_PORT}"
 echo ""
 echo "Configuration directory: $N8N_DIR"
 echo "Logs: $LOGFILE"
 echo ""
-echo "Next steps:"
-if [[ -f "$N8N_DIR/setup-cloudflare-tunnel.sh" ]]; then
-    echo "  1. Configure Cloudflare Tunnel (alternative method):"
-    echo "     cd $N8N_DIR && ./setup-cloudflare-tunnel.sh"
-    echo ""
-fi
-echo "Useful commands:"
-echo "  - Check n8n logs: docker compose -f $N8N_DIR/docker-compose.yml logs -f n8n"
-echo "  - Restart n8n: docker compose -f $N8N_DIR/docker-compose.yml restart"
-echo "  - Stop n8n: docker compose -f $N8N_DIR/docker-compose.yml down"
-echo "  - Cloudflare status: systemctl status cloudflared"
+echo "=========================================="
+echo "  📋 Next Steps"
+echo "=========================================="
+echo ""
+echo "1. 🌐 Setup Cloudflare Tunnel for public access:"
+echo "   cd $N8N_DIR"
+echo "   bash setup-cloudflare-tunnel.sh"
+echo ""
+echo "2. 📊 List existing Cloudflare Tunnels:"
+echo "   cd $N8N_DIR"
+echo "   bash list-tunnels.sh"
+echo ""
+echo "3. 🔑 Manage API Token:"
+echo "   cd $N8N_DIR"
+echo "   bash manage-api-token.sh"
+echo ""
+echo "=========================================="
+echo "  🔧 Useful Commands"
+echo "=========================================="
+echo ""
+echo "Check n8n status:"
+echo "  docker ps"
+echo "  docker logs n8n-n8n-1 -f"
+echo ""
+echo "Restart n8n:"
+echo "  cd $N8N_DIR && docker compose restart"
+echo ""
+echo "Stop n8n:"
+echo "  cd $N8N_DIR && docker compose down"
+echo ""
+echo "View setup logs:"
+echo "  tail -f $LOGFILE"
+echo ""
 echo "=========================================="
 
 log "=== Setup completed successfully ==="
