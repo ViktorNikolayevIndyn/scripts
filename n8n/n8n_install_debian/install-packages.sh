@@ -34,41 +34,29 @@ log "Upgrading existing packages..."
 apt upgrade -y >> "$LOGFILE" 2>&1 || log "Warning: apt upgrade had issues, continuing..."
 
 log "Installing essential tools..."
-if ! apt install -y \
-    curl \
-    wget \
-    git \
-    nano \
-    htop \
-    ufw \
-    fail2ban \
-    ca-certificates \
-    gnupg \
-    software-properties-common \
-    apt-transport-https \
-    lsb-release \
-    jq \
-    2>&1 | tee -a "$LOGFILE"; then
-    
-    log "Installation failed, checking detailed error..."
-    log "Attempting to install packages individually..."
-    
-    # Try to install critical packages one by one
-    CRITICAL_PACKAGES="curl wget git ca-certificates gnupg jq"
-    for pkg in $CRITICAL_PACKAGES; do
-        if ! apt install -y "$pkg" >> "$LOGFILE" 2>&1; then
-            error_exit "Failed to install critical package: $pkg"
-        fi
-    done
-    
-    # Try optional packages
-    OPTIONAL_PACKAGES="nano htop ufw fail2ban software-properties-common apt-transport-https lsb-release"
-    for pkg in $OPTIONAL_PACKAGES; do
-        apt install -y "$pkg" >> "$LOGFILE" 2>&1 || log "Warning: Failed to install $pkg (optional)"
-    done
-fi
 
-log "✓ Basic packages installed"
+# Install critical packages first
+CRITICAL_PACKAGES="curl wget git ca-certificates gnupg jq"
+log "Installing critical packages: $CRITICAL_PACKAGES"
+for pkg in $CRITICAL_PACKAGES; do
+    log "Installing $pkg..."
+    if ! apt install -y "$pkg" >> "$LOGFILE" 2>&1; then
+        error_exit "Failed to install critical package: $pkg"
+    fi
+done
+
+# Install optional packages (don't fail if they're missing)
+OPTIONAL_PACKAGES="nano htop ufw fail2ban lsb-release"
+log "Installing optional packages..."
+for pkg in $OPTIONAL_PACKAGES; do
+    if apt install -y "$pkg" >> "$LOGFILE" 2>&1; then
+        log "✓ Installed $pkg"
+    else
+        log "⚠ Skipped $pkg (not available or failed)"
+    fi
+done
+
+log "✓ Essential packages installed"
 
 # ============================================================================
 # 2. Docker & Docker Compose
@@ -143,40 +131,33 @@ log "✓ Cloudflared installed: $CLOUDFLARED_VERSION"
 log "Verifying installations..."
 
 FAILED=0
+FAILED_PACKAGES=""
 
-# Check curl
-if ! command -v curl >/dev/null 2>&1; then
-    error_exit "curl not installed"
-fi
+# Check critical packages
+CRITICAL_CHECKS="curl wget git jq docker"
+for cmd in $CRITICAL_CHECKS; do
+    if ! command -v "$cmd" >/dev/null 2>&1; then
+        log "✗ $cmd not found"
+        FAILED=$((FAILED + 1))
+        FAILED_PACKAGES="$FAILED_PACKAGES $cmd"
+    else
+        log "✓ $cmd installed"
+    fi
+done
 
-# Check wget
-if ! command -v wget >/dev/null 2>&1; then
-    error_exit "wget not installed"
-fi
+# Check optional packages (just warn)
+OPTIONAL_CHECKS="ufw fail2ban-client nano htop"
+for cmd in $OPTIONAL_CHECKS; do
+    if ! command -v "$cmd" >/dev/null 2>&1; then
+        log "⚠ $cmd not found (optional)"
+    else
+        log "✓ $cmd installed"
+    fi
+done
 
-# Check git
-if ! command -v git >/dev/null 2>&1; then
-    error_exit "git not installed"
-fi
-
-# Check jq
-if ! command -v jq >/dev/null 2>&1; then
-    error_exit "jq not installed"
-fi
-
-# Check ufw
-if ! command -v ufw >/dev/null 2>&1; then
-    error_exit "ufw not installed"
-fi
-
-# Check fail2ban
-if ! command -v fail2ban-client >/dev/null 2>&1; then
-    error_exit "fail2ban not installed"
-fi
-
-# Check Docker
-if ! command -v docker >/dev/null 2>&1; then
-    error_exit "docker not installed"
+# Fail if critical packages missing
+if [ $FAILED -gt 0 ]; then
+    error_exit "Critical packages missing:$FAILED_PACKAGES"
 fi
 
 # Check Docker service
