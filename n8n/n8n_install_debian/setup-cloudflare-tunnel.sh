@@ -245,10 +245,36 @@ echo ""
 log "Tunnel Configuration"
 echo ""
 
+# Check if .env exists and load defaults
+ENV_FILE="/opt/n8n/.env"
+N8N_HOST_DEFAULT=""
+USE_ENV_DEFAULTS=false
+
+if [ -f "$ENV_FILE" ]; then
+    log "Found existing .env configuration"
+    read -p "Use domain from .env as default? [Y/n]: " USE_ENV
+    USE_ENV=${USE_ENV:-Y}
+    
+    if [[ "$USE_ENV" =~ ^[Yy]$ ]]; then
+        # Load N8N_HOST from .env
+        N8N_HOST_DEFAULT=$(grep "^N8N_HOST=" "$ENV_FILE" | cut -d'=' -f2 | tr -d '"' | tr -d "'")
+        USE_ENV_DEFAULTS=true
+        if [ -n "$N8N_HOST_DEFAULT" ]; then
+            success "Loaded domain from .env: $N8N_HOST_DEFAULT"
+        fi
+    fi
+fi
+
 read -p "🔤 Tunnel name [$TUNNEL_NAME_DEFAULT]: " TUNNEL_NAME
 TUNNEL_NAME=${TUNNEL_NAME:-$TUNNEL_NAME_DEFAULT}
 
-read -p "🌐 Your domain (e.g., n8n.example.com): " DOMAIN
+if [ "$USE_ENV_DEFAULTS" = true ] && [ -n "$N8N_HOST_DEFAULT" ]; then
+    read -p "🌐 Your domain [$N8N_HOST_DEFAULT]: " DOMAIN
+    DOMAIN=${DOMAIN:-$N8N_HOST_DEFAULT}
+else
+    read -p "🌐 Your domain (e.g., n8n.example.com): " DOMAIN
+fi
+
 if [ -z "$DOMAIN" ]; then
     error "Domain is required!"
     exit 1
@@ -279,7 +305,12 @@ else
         -H "Authorization: Bearer $CF_API_TOKEN" \
         -H "Content-Type: application/json")
     
-    EXISTING_TUNNEL_ID=$(echo "$TUNNELS_RESPONSE" | jq -r ".result[] | select(.name == \"$TUNNEL_NAME\") | .id // empty")
+    # Check if result exists and is an array
+    if echo "$TUNNELS_RESPONSE" | jq -e '.result' >/dev/null 2>&1; then
+        EXISTING_TUNNEL_ID=$(echo "$TUNNELS_RESPONSE" | jq -r ".result[]? | select(.name == \"$TUNNEL_NAME\") | .id // empty")
+    else
+        EXISTING_TUNNEL_ID=""
+    fi
     
     if [ -n "$EXISTING_TUNNEL_ID" ]; then
         warning "Tunnel '$TUNNEL_NAME' already exists (ID: $EXISTING_TUNNEL_ID)"
