@@ -10,7 +10,7 @@ set -e
 REPO_OWNER="ViktorNikolayevIndyn"
 REPO_NAME="scripts"
 BRANCH="main"
-BASE_PATH="public/cloudflare_scripts/n8n/n8n_install_debian"
+BASE_PATH="n8n/n8n_install_debian"
 BASE_URL="https://raw.githubusercontent.com/${REPO_OWNER}/${REPO_NAME}/${BRANCH}/${BASE_PATH}"
 
 # Files to download

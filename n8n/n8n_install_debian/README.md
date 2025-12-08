@@ -1,255 +1,291 @@
-# n8n One-Click Setup mit Cloudflare Tunnel für Debian 12/13
+# 🚀 n8n Automated Setup with Cloudflare Tunnel
 
-Dieses Skript richtet automatisch einen sicheren n8n-Server mit Cloudflare Tunnel auf Debian 12 oder 13 ein.
+**One-command installation** of a secure n8n workflow automation server on Debian 12/13 with Cloudflare Tunnel integration.
 
-## Features
+## ✨ Features
 
-- ✅ Vollständig automatisiertes Setup
-- ✅ System-Härtung (UFW Firewall, Fail2Ban)
-- ✅ SSH-Hardening
-- ✅ Docker & Docker Compose Installation
-- ✅ n8n mit PostgreSQL-Datenbank
-- ✅ Cloudflare Tunnel für sicheren Zugriff
-- ✅ Automatischer Start beim Booten
-- ✅ Basic Auth für n8n
+- ⚡ **Fully Automated** - Single command installation
+- 🔒 **Security Hardened** - UFW firewall, Fail2Ban, SSH hardening
+- 🐳 **Docker-based** - n8n + PostgreSQL in containers
+- 🌐 **Cloudflare Tunnel** - Secure access without port forwarding
+- 🔐 **Basic Auth** - Built-in authentication
+- 📦 **Production Ready** - Auto-start on boot, persistent data
+- 🛠️ **Modular** - Separate scripts for packages, config, tunnel
 
-## Voraussetzungen
+## 📋 Requirements
 
-- Frischer Debian 12 oder 13 Server
-- Root-Zugriff
-- Cloudflare Account mit konfiguriertem Tunnel
-- Domain/Subdomain für n8n (z.B. `n8n.example.com`)
+- Fresh Debian 12 or 13 server
+- Root access (sudo)
+- Cloudflare account (for tunnel setup)
+- Domain/subdomain (e.g., `n8n.example.com`)
 
-## Vorbereitung
+## 🚀 Quick Start
 
-### 1. Cloudflare Tunnel erstellen
-
-1. Gehe zu [Cloudflare Zero Trust Dashboard](https://one.dash.cloudflare.com/)
-2. Navigiere zu **Access** → **Tunnels**
-3. Klicke auf **Create a tunnel**
-4. Wähle **Cloudflared** als Connector
-5. Gib dem Tunnel einen Namen (z.B. `n8n-server`)
-6. Kopiere den **Tunnel Token** (wird später benötigt)
-7. Konfiguriere die Public Hostname:
-   - **Subdomain**: `n8n`
-   - **Domain**: `example.com`
-   - **Service**: `http://localhost:5678`
-
-### 2. Server vorbereiten
-
-Stelle sicher, dass du SSH-Schlüssel für den Zugriff eingerichtet hast, da das Skript Passwort-Authentifizierung deaktiviert.
+### One-Line Installation
 
 ```bash
-# Von deinem lokalen Rechner
-ssh-copy-id root@your-server-ip
+bash -c "$(curl -fsSL https://raw.githubusercontent.com/ViktorNikolayevIndyn/scripts/main/n8n/install.sh)"
 ```
 
-## Installation
+**That's it!** The script will:
+1. ✅ Install all dependencies (Docker, Cloudflared, etc.)
+2. ✅ Harden server security (UFW, Fail2Ban, SSH)
+3. ✅ Set up n8n with PostgreSQL
+4. ✅ Generate secure configuration
+5. ✅ Start n8n in Docker
 
-### Schritt 1: Repository klonen oder Dateien hochladen
+After installation, you'll be prompted to configure Cloudflare Tunnel.
 
-```bash
-# Mit Git
-cd /tmp
-git clone <repository-url>
-cd cloudflare_scripts/n8n/n8n_install_debian/
+---
 
-# Oder Dateien manuell hochladen
-scp -r n8n_install_debian/ root@your-server:/tmp/
-```
+## 📚 Alternative Installation Methods
 
-### Schritt 2: Skript ausführen
+See [INSTALL.md](./INSTALL.md) for:
+- Git clone method
+- Manual file download
+- SCP from Windows
+- Offline installation
 
-```bash
-cd /tmp/n8n_install_debian/
-chmod +x setup.sh
+---
 
-# Option 1: Mit Umgebungsvariable
-export CLOUDFLARE_TUNNEL_TOKEN="your-tunnel-token-here"
-bash setup.sh
+## 🔧 What Gets Installed?
 
-# Option 2: Token wird während der Installation abgefragt
-bash setup.sh
-```
+### 1. System Packages
+- `curl`, `wget`, `git`, `nano`, `htop`, `jq`
+- `ufw` - Firewall (ports: 22, 80, 443)
+- `fail2ban` - Brute-force protection
 
-### Schritt 3: Interaktive Eingaben
+### 2. Docker Stack
+- Docker Engine (latest)
+- Docker Compose Plugin
+- n8n container (latest)
+- PostgreSQL 15 container
 
-Das Skript fragt während der Installation:
+### 3. Cloudflare Tools
+- `cloudflared` - Tunnel client
 
-1. **n8n Hostname**: z.B. `n8n.example.com`
-2. **Basic Auth Username**: z.B. `admin` (Standard)
-3. **Basic Auth Password**: Sicheres Passwort
-4. **Cloudflare Tunnel Token**: Falls nicht als Umgebungsvariable gesetzt
+---
 
-## Was macht das Skript?
+## ⚙️ Configuration
 
-### 1. System-Härtung
-- UFW Firewall aktivieren (Ports 22, 80, 443)
-- Fail2Ban konfigurieren (Schutz vor Brute-Force)
-- SSH härten (Passwort-Auth deaktivieren)
+### Interactive Setup
 
-### 2. Docker Installation
-- Offizielle Docker-Repository einbinden
-- Docker Engine & Docker Compose installieren
-- Docker beim Booten starten
+During installation, you'll be asked:
 
-### 3. n8n Setup
-- PostgreSQL als Datenbank
-- n8n Container mit allen Konfigurationen
-- Volumes für persistente Daten
-- Basic Auth aktiviert
+1. **n8n Domain** - Your subdomain (e.g., `n8n.example.com`)
+2. **Basic Auth Username** - Default: `admin`
+3. **Basic Auth Password** - Auto-generated or custom
+4. **PostgreSQL Password** - Auto-generated or custom
+5. **Timezone** - Default: `Europe/Berlin`
 
-### 4. Cloudflare Tunnel
-- cloudflared installieren
-- Systemd-Service erstellen
-- Automatischer Start beim Booten
+All settings are saved to `/opt/n8n/.env`
 
-### 5. Auto-Start
-- Systemd-Service für n8n
-- Automatischer Start nach Reboot
+### Manual Configuration
 
-## Nach der Installation
-
-### Zugriff auf n8n
-
-Öffne deinen Browser und gehe zu:
-```
-https://n8n.example.com
-```
-
-Logge dich mit deinen konfigurierten Credentials ein.
-
-### Wichtige Pfade
-
-- **n8n Verzeichnis**: `/opt/n8n/`
-- **Docker Compose Config**: `/opt/n8n/docker-compose.yml`
-- **Umgebungsvariablen**: `/opt/n8n/.env`
-- **Logs**: `/var/log/server-setup.log`
-
-### Nützliche Befehle
-
-```bash
-# n8n Logs anzeigen
-cd /opt/n8n && docker compose logs -f
-
-# n8n Container neustarten
-cd /opt/n8n && docker compose restart
-
-# n8n Container stoppen
-cd /opt/n8n && docker compose down
-
-# n8n Container starten
-cd /opt/n8n && docker compose up -d
-
-# Cloudflare Tunnel Status
-systemctl status cloudflared
-
-# Cloudflare Tunnel Logs
-journalctl -u cloudflared -f
-
-# n8n Service Status
-systemctl status n8n-docker
-
-# Firewall Status
-ufw status
-
-# Fail2Ban Status
-fail2ban-client status sshd
-```
-
-### Container Status prüfen
-
-```bash
-docker ps
-```
-
-Erwartete Container:
-- `n8n-n8n-1` - n8n Application
-- `n8n-postgres-1` - PostgreSQL Database
-
-### Datenbank-Backup erstellen
-
-```bash
-cd /opt/n8n
-docker compose exec postgres pg_dump -U n8n n8n > backup_$(date +%Y%m%d).sql
-```
-
-## Konfiguration anpassen
-
-### n8n Umgebungsvariablen ändern
-
+Edit configuration file:
 ```bash
 nano /opt/n8n/.env
 ```
 
-Nach Änderungen Container neu starten:
+Restart n8n:
 ```bash
-cd /opt/n8n && docker compose restart
-```
-
-### Weitere n8n Optionen
-
-Siehe [n8n Environment Variables](https://docs.n8n.io/hosting/configuration/environment-variables/) für alle verfügbaren Optionen.
-
-## Troubleshooting
-
-### n8n startet nicht
-
-```bash
-# Logs prüfen
-cd /opt/n8n && docker compose logs
-
-# Container neu starten
+cd /opt/n8n
 docker compose restart
 ```
 
-### Cloudflare Tunnel verbindet nicht
+---
+
+## 🌐 Cloudflare Tunnel Setup
+
+After main installation, configure Cloudflare Tunnel:
 
 ```bash
-# Status prüfen
-systemctl status cloudflared
-
-# Logs prüfen
-journalctl -u cloudflared -f
-
-# Service neu starten
-systemctl restart cloudflared
+cd /opt/n8n
+bash setup-cloudflare-tunnel.sh
 ```
 
-### Firewall-Probleme
+The script will:
+1. Authenticate with Cloudflare (opens browser)
+2. Create tunnel
+3. Configure DNS record
+4. Set up systemd service
 
+**Alternative**: Manual tunnel setup via [Cloudflare Dashboard](https://one.dash.cloudflare.com/)
+
+---
+
+## 📊 Management
+
+### Check n8n Status
 ```bash
-# UFW Status
-ufw status verbose
-
-# Port öffnen (falls nötig)
-ufw allow PORT/tcp
+docker ps
+docker logs n8n -f
 ```
 
-### SSH-Zugriff nach Installation
+### Start/Stop n8n
+```bash
+cd /opt/n8n
+docker compose up -d      # Start
+docker compose down       # Stop
+docker compose restart    # Restart
+```
 
-Falls du ausgesperrt wirst:
-- Stelle sicher, dass dein SSH-Key vor der Installation kopiert wurde
-- Nutze die Server-Konsole deines Hosters
-- Prüfe `/etc/ssh/sshd_config`
+### Check Cloudflare Tunnel
+```bash
+systemctl status cloudflared-n8n-tunnel
+journalctl -u cloudflared-n8n-tunnel -f
+```
 
-## Sicherheitshinweise
+### View Setup Logs
+```bash
+tail -f /var/log/server-setup.log
+```
 
-1. **Backup erstellen**: Erstelle regelmäßig Backups der n8n-Datenbank
-2. **Updates**: Halte das System und Docker-Images aktuell
-3. **Passwörter**: Verwende starke Passwörter für Basic Auth
-4. **Firewall**: Ändere nur Firewall-Regeln, wenn du weißt, was du tust
-5. **Monitoring**: Überwache die Logs regelmäßig
+---
 
-## Updates
+## 🗂️ File Structure
 
-### n8n aktualisieren
+```
+/opt/n8n/
+├── .env                    # Configuration
+├── docker-compose.yml      # Docker setup
+├── setup-cloudflare-tunnel.sh  # Tunnel setup script
+└── volumes/
+    ├── n8n-data/          # n8n workflows
+    └── postgres-data/     # Database
 
+/var/log/
+└── server-setup.log       # Installation log
+
+/etc/systemd/system/
+└── cloudflared-*.service  # Tunnel service
+```
+
+---
+
+## 🔄 Updates
+
+### Update n8n
 ```bash
 cd /opt/n8n
 docker compose pull
 docker compose up -d
 ```
+
+### Update Cloudflared
+```bash
+curl -L --output /usr/local/bin/cloudflared \
+    https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64
+chmod +x /usr/local/bin/cloudflared
+systemctl restart cloudflared-n8n-tunnel
+```
+
+### Update System
+```bash
+apt update && apt upgrade -y
+```
+
+---
+
+## 💾 Backup & Restore
+
+### Backup Database
+```bash
+cd /opt/n8n
+docker compose exec postgres pg_dump -U n8n n8n > backup_$(date +%Y%m%d_%H%M%S).sql
+```
+
+### Restore Database
+```bash
+cd /opt/n8n
+cat backup_YYYYMMDD_HHMMSS.sql | docker compose exec -T postgres psql -U n8n -d n8n
+```
+
+### Backup n8n Data
+```bash
+tar -czf n8n_backup_$(date +%Y%m%d).tar.gz /opt/n8n
+```
+
+---
+
+## 🐛 Troubleshooting
+
+### n8n Not Starting
+```bash
+# Check logs
+docker logs n8n -f
+
+# Check configuration
+cat /opt/n8n/.env
+
+# Restart containers
+cd /opt/n8n && docker compose restart
+```
+
+### Cloudflare Tunnel Issues
+```bash
+# Check tunnel status
+systemctl status cloudflared-n8n-tunnel
+
+# Check tunnel logs
+journalctl -u cloudflared-n8n-tunnel -f
+
+# Restart tunnel
+systemctl restart cloudflared-n8n-tunnel
+```
+
+### Can't Access n8n
+1. Check Docker containers: `docker ps`
+2. Check Cloudflare Tunnel status
+3. Verify DNS record in Cloudflare Dashboard
+4. Check firewall: `ufw status`
+5. Test local access: `curl http://localhost:80`
+
+### Locked Out via SSH
+- Use your hosting provider's console/VNC
+- Check if SSH key is properly configured
+- Verify `/etc/ssh/sshd_config` settings
+- Check fail2ban: `fail2ban-client status sshd`
+
+---
+
+## 🔒 Security Best Practices
+
+1. **Regular Backups** - Automate database backups
+2. **Keep Updated** - Update system and containers regularly
+3. **Strong Passwords** - Use generated passwords (25+ chars)
+4. **Monitor Logs** - Check `/var/log/server-setup.log` regularly
+5. **Firewall Rules** - Only allow necessary ports
+6. **Fail2Ban** - Monitor brute-force attempts
+7. **SSH Keys Only** - Never enable password authentication
+
+---
+
+## 📖 Additional Resources
+
+- [n8n Documentation](https://docs.n8n.io/)
+- [n8n Environment Variables](https://docs.n8n.io/hosting/configuration/environment-variables/)
+- [Cloudflare Tunnel Docs](https://developers.cloudflare.com/cloudflare-one/connections/connect-apps/)
+- [Docker Compose Reference](https://docs.docker.com/compose/)
+
+---
+
+## 🤝 Support
+
+For issues or questions:
+- Check [INSTALL.md](./INSTALL.md) for detailed installation steps
+- Review logs: `/var/log/server-setup.log`
+- Check Docker logs: `docker compose logs`
+
+---
+
+## 📝 License
+
+MIT License - Use freely for personal or commercial projects.
+
+---
+
+**Made with ❤️ for automated n8n deployments**
 
 ### System aktualisieren
 

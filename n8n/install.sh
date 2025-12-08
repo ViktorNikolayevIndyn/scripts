@@ -3,7 +3,7 @@
 # n8n Quick Installer
 # One-command setup for n8n with Cloudflare Tunnel on Debian 12/13
 #
-# Usage: bash -c "$(curl -fsSL https://raw.githubusercontent.com/ViktorNikolayevIndyn/scripts/main/public/cloudflare_scripts/n8n/install.sh)"
+# Usage: bash -c "$(curl -fsSL https://raw.githubusercontent.com/ViktorNikolayevIndyn/scripts/main/n8n/install.sh)"
 #
 
 set -e
@@ -44,7 +44,7 @@ if [[ "$DEBIAN_VERSION" != "12" && "$DEBIAN_VERSION" != "13" ]]; then
 fi
 
 # Configuration
-REPO_URL="https://raw.githubusercontent.com/ViktorNikolayevIndyn/scripts/main/public/cloudflare_scripts/n8n/n8n_install_debian"
+REPO_URL="https://raw.githubusercontent.com/ViktorNikolayevIndyn/scripts/main/n8n/n8n_install_debian"
 WORK_DIR="/tmp/n8n_setup_$$"
 INSTALL_DIR="/opt/n8n"
 
