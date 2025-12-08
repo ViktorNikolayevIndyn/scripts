@@ -477,9 +477,30 @@ fi
 
 CREDENTIAL_FILE="$CONFIG_DIR/$TUNNEL_ID.json"
 
+# Verify credentials file exists
 if [ ! -f "$CREDENTIAL_FILE" ]; then
-  error "Credentials file not found: $CREDENTIAL_FILE"
-  exit 1
+    if [ "$USE_API" = true ]; then
+        # Try to download credentials for existing tunnel
+        log "Credentials file not found, attempting to download..."
+        TUNNEL_TOKEN_RESPONSE=$(curl -s "https://api.cloudflare.com/client/v4/accounts/$CF_ACCOUNT_ID/cfd_tunnel/$TUNNEL_ID/token" \
+            -H "Authorization: Bearer $CF_API_TOKEN")
+        
+        TUNNEL_TOKEN=$(echo "$TUNNEL_TOKEN_RESPONSE" | jq -r '.result // empty')
+        
+        if [ -n "$TUNNEL_TOKEN" ]; then
+            echo "$TUNNEL_TOKEN" | base64 -d 2>/dev/null > "$CREDENTIAL_FILE" || {
+                echo "$TUNNEL_TOKEN" > "$CREDENTIAL_FILE"
+            }
+            chmod 600 "$CREDENTIAL_FILE"
+            success "Credentials downloaded"
+        else
+            error "Credentials file not found and could not download: $CREDENTIAL_FILE"
+            exit 1
+        fi
+    else
+        error "Credentials file not found: $CREDENTIAL_FILE"
+        exit 1
+    fi
 fi
 
 # 💾 Write config.yml
