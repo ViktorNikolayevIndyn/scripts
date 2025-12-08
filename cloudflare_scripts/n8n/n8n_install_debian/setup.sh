@@ -14,7 +14,7 @@ set -e  # Exit on error
 # ============================================================================
 LOGFILE="/var/log/server-setup.log"
 N8N_DIR="/opt/n8n"
-N8N_PORT="5678"
+N8N_PORT="80"
 PERMIT_ROOT_LOGIN="prohibit-password"  # Options: no, prohibit-password, yes
 N8N_USER="n8nuser"
 FAIL2BAN_MAXRETRY="5"
@@ -68,18 +68,18 @@ check_debian
 log "=== Starting server setup ==="
 
 # ============================================================================
-# 1. System Update & Basic Packages
+# 1. Install Packages
 # ============================================================================
-log "Step 1: Updating system and installing basic packages..."
-apt update -y >> "$LOGFILE" 2>&1 || error_exit "apt update failed"
-apt upgrade -y >> "$LOGFILE" 2>&1 || error_exit "apt upgrade failed"
+log "Step 1: Installing required packages..."
 
-log "Installing essential packages..."
-apt install -y curl wget git nano htop ufw fail2ban ca-certificates gnupg \
-    software-properties-common apt-transport-https lsb-release >> "$LOGFILE" 2>&1 || \
-    error_exit "Failed to install basic packages"
+INSTALL_SCRIPT="$(dirname "$0")/install-packages.sh"
+if [[ -f "$INSTALL_SCRIPT" ]]; then
+    bash "$INSTALL_SCRIPT" || error_exit "Package installation failed"
+else
+    error_exit "install-packages.sh not found"
+fi
 
-log "✓ System updated and basic packages installed"
+log "✓ All packages installed"
 
 # ============================================================================
 # 2. Firewall (UFW)
@@ -165,73 +165,39 @@ systemctl restart sshd >> "$LOGFILE" 2>&1
 log "✓ SSH hardened (PasswordAuthentication disabled, PubkeyAuthentication enabled)"
 
 # ============================================================================
-# 5. Docker & Docker Compose
+# 5. Docker Group Access
 # ============================================================================
-log "Step 5: Installing Docker and Docker Compose..."
-
-# Add Docker's official GPG key
-install -m 0755 -d /etc/apt/keyrings
-curl -fsSL https://download.docker.com/linux/debian/gpg -o /etc/apt/keyrings/docker.asc
-chmod a+r /etc/apt/keyrings/docker.asc
-
-# Add Docker repository
-echo \
-  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/debian \
-  $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
-  tee /etc/apt/sources.list.d/docker.list > /dev/null
-
-# Install Docker
-apt update -y >> "$LOGFILE" 2>&1
-apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin >> "$LOGFILE" 2>&1
-
-# Enable Docker service
-systemctl enable docker >> "$LOGFILE" 2>&1
-systemctl start docker >> "$LOGFILE" 2>&1
+log "Step 5: Configuring Docker access for user..."
 
 # Add user to docker group
 usermod -aG docker "$N8N_USER"
 
-# Test Docker
-docker run --rm hello-world >> "$LOGFILE" 2>&1 && log "✓ Docker installed and tested successfully" || error_exit "Docker installation failed"
+log "✓ User $N8N_USER added to docker group"
 
 # ============================================================================
-# 6. n8n Docker Stack
+# 6. n8n Configuration
 # ============================================================================
-log "Step 6: Setting up n8n with Docker Compose..."
+log "Step 6: Generating n8n configuration..."
 
 # Create n8n directory
 mkdir -p "$N8N_DIR"
 cd "$N8N_DIR"
 
-# Get configuration
-read -p "Enter n8n hostname (e.g., n8n.example.com): " N8N_HOSTNAME
-read -p "Enter Basic Auth username [admin]: " N8N_AUTH_USER
-N8N_AUTH_USER=${N8N_AUTH_USER:-admin}
-read -s -p "Enter Basic Auth password: " N8N_AUTH_PASS
-echo ""
+# Generate config if not exists
+CONFIG_SCRIPT="$(dirname "$0")/generate-config.sh"
+if [[ ! -f "$N8N_DIR/.env" ]]; then
+    if [[ -f "$CONFIG_SCRIPT" ]]; then
+        bash "$CONFIG_SCRIPT" || error_exit "Configuration generation failed"
+    else
+        error_exit "generate-config.sh not found"
+    fi
+else
+    log "✓ Configuration file already exists"
+fi
 
-# Create .env file
-cat > "$N8N_DIR/.env" <<EOF
-# n8n Configuration
-N8N_HOST=${N8N_HOSTNAME}
-N8N_PORT=${N8N_PORT}
-N8N_PROTOCOL=https
-N8N_BASIC_AUTH_ACTIVE=true
-N8N_BASIC_AUTH_USER=${N8N_AUTH_USER}
-N8N_BASIC_AUTH_PASSWORD=${N8N_AUTH_PASS}
-
-# Database Configuration
-POSTGRES_USER=n8n
-POSTGRES_PASSWORD=$(openssl rand -base64 32)
-POSTGRES_DB=n8n
-
-# Timezone
-GENERIC_TIMEZONE=Europe/Berlin
-TZ=Europe/Berlin
-EOF
-
-chmod 600 "$N8N_DIR/.env"
-log "Created .env file at $N8N_DIR/.env"
+# Load configuration
+source "$N8N_DIR/.env"
+log "✓ Configuration loaded"
 
 # Copy docker-compose.yml
 cp "$(dirname "$0")/docker-compose.yml" "$N8N_DIR/docker-compose.yml" 2>/dev/null || \
@@ -269,7 +235,7 @@ services:
       - N8N_HOST=${N8N_HOST}
       - N8N_PORT=${N8N_PORT}
       - N8N_PROTOCOL=${N8N_PROTOCOL}
-      - WEBHOOK_URL=https://${N8N_HOST}/
+      - WEBHOOK_URL=https://${N8N_HOST}
       - N8N_BASIC_AUTH_ACTIVE=${N8N_BASIC_AUTH_ACTIVE}
       - N8N_BASIC_AUTH_USER=${N8N_BASIC_AUTH_USER}
       - N8N_BASIC_AUTH_PASSWORD=${N8N_BASIC_AUTH_PASSWORD}
