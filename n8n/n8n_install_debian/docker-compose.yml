@@ -43,7 +43,7 @@ services:
       postgres:
         condition: service_healthy
     networks:
-      - network-n8n
+      - n8n-network
 
 volumes:
   n8n-data:
