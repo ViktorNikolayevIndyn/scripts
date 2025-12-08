@@ -44,16 +44,25 @@ fi
 
 # 📦 Dependency check & install
 check_dependency() {
-  if ! command -v "$1" >/dev/null 2>&1; then
-    log "Installing $1..."
-    apt update -qq && apt install -y "$1" > /dev/null 2>&1
+  local cmd=$1
+  local pkg=${2:-$1}
+  
+  if ! command -v "$cmd" >/dev/null 2>&1; then
+    log "Installing $pkg..."
+    apt update -qq && apt install -y "$pkg" >/dev/null 2>&1
+    if command -v "$cmd" >/dev/null 2>&1; then
+      success "$cmd installed"
+    else
+      error "Failed to install $pkg"
+      exit 1
+    fi
   fi
 }
 
 log "Checking dependencies..."
 check_dependency curl
 check_dependency jq
-check_dependency uuidgen
+check_dependency uuidgen uuid-runtime
 
 # Install cloudflared if not present
 if [ ! -f "$CLOUDFLARED_BIN" ]; then
