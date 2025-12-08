@@ -6,9 +6,14 @@
 
 set -e
 
-CONFIG_DIR="$(cd "$(dirname "$0")" && pwd)"
+# Use N8N_DIR from environment or default to /opt/n8n
+N8N_DIR="${N8N_DIR:-/opt/n8n}"
+CONFIG_DIR="$N8N_DIR"
 ENV_FILE="$CONFIG_DIR/.env"
-ENV_EXAMPLE="$CONFIG_DIR/.env.example"
+ENV_EXAMPLE="$(dirname "$0")/.env.example"
+
+# Ensure directory exists
+mkdir -p "$CONFIG_DIR"
 
 # Colors
 GREEN='\033[0;32m'

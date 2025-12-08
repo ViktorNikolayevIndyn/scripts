@@ -204,6 +204,8 @@ if [[ ! -f "$N8N_DIR/.env" ]]; then
     
     if [[ -n "$CONFIG_SCRIPT" ]] && [[ -f "$CONFIG_SCRIPT" ]]; then
         log "Using config generator: $CONFIG_SCRIPT"
+        # Export N8N_DIR so generate-config.sh knows where to create .env
+        export N8N_DIR
         bash "$CONFIG_SCRIPT" || error_exit "Configuration generation failed"
     else
         log "⚠ generate-config.sh not found, creating basic configuration..."
