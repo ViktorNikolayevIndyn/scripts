@@ -14,7 +14,7 @@ services:
       timeout: 5s
       retries: 10
     networks:
-      - n8n-network
+      - n8nnetwork
 
   n8n:
     image: n8nio/n8n:latest
