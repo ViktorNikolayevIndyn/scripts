@@ -68,6 +68,7 @@ FILES=(
     "install-packages.sh"
     "generate-config.sh"
     "setup-cloudflare-tunnel.sh"
+    "list-tunnels.sh"
     "docker-compose.yml"
     ".env.example"
 )
@@ -93,17 +94,30 @@ echo ""
 
 bash setup.sh
 
-# Copy setup-cloudflare-tunnel.sh to /opt/n8n if it exists
-if [ -f "$WORK_DIR/setup-cloudflare-tunnel.sh" ] && [ -d "$INSTALL_DIR" ]; then
-    log "Copying setup-cloudflare-tunnel.sh to $INSTALL_DIR..."
-    cp "$WORK_DIR/setup-cloudflare-tunnel.sh" "$INSTALL_DIR/"
-    chmod +x "$INSTALL_DIR/setup-cloudflare-tunnel.sh"
+# Copy helper scripts to /opt/n8n if they exist
+if [ -d "$INSTALL_DIR" ]; then
+    log "Copying helper scripts to $INSTALL_DIR..."
     
     # Get n8n user from setup.sh or default
     N8N_USER=$(grep "^N8N_USER=" "$WORK_DIR/setup.sh" 2>/dev/null | cut -d'"' -f2 || echo "n8nuser")
-    chown "$N8N_USER":"$N8N_USER" "$INSTALL_DIR/setup-cloudflare-tunnel.sh" 2>/dev/null || true
     
-    success "setup-cloudflare-tunnel.sh copied to $INSTALL_DIR"
+    # Copy setup-cloudflare-tunnel.sh
+    if [ -f "$WORK_DIR/setup-cloudflare-tunnel.sh" ]; then
+        cp "$WORK_DIR/setup-cloudflare-tunnel.sh" "$INSTALL_DIR/"
+        chmod +x "$INSTALL_DIR/setup-cloudflare-tunnel.sh"
+        chown "$N8N_USER":"$N8N_USER" "$INSTALL_DIR/setup-cloudflare-tunnel.sh" 2>/dev/null || true
+        log "✓ setup-cloudflare-tunnel.sh"
+    fi
+    
+    # Copy list-tunnels.sh
+    if [ -f "$WORK_DIR/list-tunnels.sh" ]; then
+        cp "$WORK_DIR/list-tunnels.sh" "$INSTALL_DIR/"
+        chmod +x "$INSTALL_DIR/list-tunnels.sh"
+        chown "$N8N_USER":"$N8N_USER" "$INSTALL_DIR/list-tunnels.sh" 2>/dev/null || true
+        log "✓ list-tunnels.sh"
+    fi
+    
+    success "Helper scripts copied to $INSTALL_DIR"
 fi
 
 # Cleanup
@@ -122,11 +136,15 @@ echo "  1. Configure Cloudflare Tunnel:"
 echo "     cd $INSTALL_DIR"
 echo "     bash setup-cloudflare-tunnel.sh"
 echo ""
-echo "  2. Check n8n status:"
+echo "  2. List Cloudflare Tunnels (API):"
+echo "     cd $INSTALL_DIR"
+echo "     bash list-tunnels.sh"
+echo ""
+echo "  3. Check n8n status:"
 echo "     docker ps"
 echo "     docker logs n8n"
 echo ""
-echo "  3. View logs:"
+echo "  4. View logs:"
 echo "     tail -f /var/log/server-setup.log"
 echo ""
 echo "=========================================="
