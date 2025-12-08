@@ -21,11 +21,20 @@ error_exit() {
 # 1. System Update & Basic Packages
 # ============================================================================
 log "Installing basic system packages..."
-apt update -y >> "$LOGFILE" 2>&1 || error_exit "apt update failed"
-apt upgrade -y >> "$LOGFILE" 2>&1 || error_exit "apt upgrade failed"
+
+# Update package lists
+if ! apt update -y >> "$LOGFILE" 2>&1; then
+    log "First apt update failed, trying to fix..."
+    apt --fix-broken install -y >> "$LOGFILE" 2>&1 || true
+    dpkg --configure -a >> "$LOGFILE" 2>&1 || true
+    apt update -y >> "$LOGFILE" 2>&1 || error_exit "apt update failed"
+fi
+
+log "Upgrading existing packages..."
+apt upgrade -y >> "$LOGFILE" 2>&1 || log "Warning: apt upgrade had issues, continuing..."
 
 log "Installing essential tools..."
-apt install -y \
+if ! apt install -y \
     curl \
     wget \
     git \
@@ -39,7 +48,25 @@ apt install -y \
     apt-transport-https \
     lsb-release \
     jq \
-    >> "$LOGFILE" 2>&1 || error_exit "Failed to install basic packages"
+    2>&1 | tee -a "$LOGFILE"; then
+    
+    log "Installation failed, checking detailed error..."
+    log "Attempting to install packages individually..."
+    
+    # Try to install critical packages one by one
+    CRITICAL_PACKAGES="curl wget git ca-certificates gnupg jq"
+    for pkg in $CRITICAL_PACKAGES; do
+        if ! apt install -y "$pkg" >> "$LOGFILE" 2>&1; then
+            error_exit "Failed to install critical package: $pkg"
+        fi
+    done
+    
+    # Try optional packages
+    OPTIONAL_PACKAGES="nano htop ufw fail2ban software-properties-common apt-transport-https lsb-release"
+    for pkg in $OPTIONAL_PACKAGES; do
+        apt install -y "$pkg" >> "$LOGFILE" 2>&1 || log "Warning: Failed to install $pkg (optional)"
+    done
+fi
 
 log "✓ Basic packages installed"
 
