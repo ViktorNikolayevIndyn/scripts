@@ -185,23 +185,25 @@ cd "$N8N_DIR"
 
 # Generate config if not exists
 if [[ ! -f "$N8N_DIR/.env" ]]; then
-    CONFIG_SCRIPT="$(dirname "$0")/generate-config.sh"
+    # Try multiple locations for generate-config.sh
+    CONFIG_SCRIPT=""
     
-    # Try to find generate-config.sh
-    if [[ ! -f "$CONFIG_SCRIPT" ]]; then
-        # Try in current directory
-        if [[ -f "./generate-config.sh" ]]; then
-            CONFIG_SCRIPT="./generate-config.sh"
-        # Try in /tmp
-        elif [[ -f "/tmp/generate-config.sh" ]]; then
-            CONFIG_SCRIPT="/tmp/generate-config.sh"
-        # Try in script's directory by finding setup.sh
-        elif [[ -f "$(pwd)/generate-config.sh" ]]; then
-            CONFIG_SCRIPT="$(pwd)/generate-config.sh"
-        fi
+    # 1. Check if running from install.sh (exported variable)
+    if [[ -n "$SETUP_SCRIPT_DIR" ]] && [[ -f "$SETUP_SCRIPT_DIR/generate-config.sh" ]]; then
+        CONFIG_SCRIPT="$SETUP_SCRIPT_DIR/generate-config.sh"
+    # 2. Check same directory as setup.sh
+    elif [[ -f "$(dirname "$0")/generate-config.sh" ]]; then
+        CONFIG_SCRIPT="$(dirname "$0")/generate-config.sh"
+    # 3. Check current directory
+    elif [[ -f "./generate-config.sh" ]]; then
+        CONFIG_SCRIPT="./generate-config.sh"
+    # 4. Check /tmp directory patterns
+    elif compgen -G "/tmp/n8n_setup_*/generate-config.sh" > /dev/null; then
+        CONFIG_SCRIPT=$(ls -t /tmp/n8n_setup_*/generate-config.sh 2>/dev/null | head -1)
     fi
     
-    if [[ -f "$CONFIG_SCRIPT" ]]; then
+    if [[ -n "$CONFIG_SCRIPT" ]] && [[ -f "$CONFIG_SCRIPT" ]]; then
+        log "Using config generator: $CONFIG_SCRIPT"
         bash "$CONFIG_SCRIPT" || error_exit "Configuration generation failed"
     else
         log "⚠ generate-config.sh not found, creating basic configuration..."

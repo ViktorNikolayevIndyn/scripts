@@ -84,6 +84,9 @@ success "All files downloaded"
 # Make scripts executable
 chmod +x *.sh
 
+# Export work dir for setup.sh to find other scripts
+export SETUP_SCRIPT_DIR="$WORK_DIR"
+
 # Run setup
 log "Starting n8n setup..."
 echo ""
