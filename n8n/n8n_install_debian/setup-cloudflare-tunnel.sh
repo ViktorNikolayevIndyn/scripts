@@ -369,8 +369,8 @@ else
             warning "Tunnel '$TUNNEL_NAME' already exists (ID: $EXISTING_TUNNEL_IDS)"
         fi
         
-        read -p "Delete all and recreate? [Y/n]: " DELETE
-        DELETE=${DELETE:-Y}
+        read -p "Delete all and recreate? [y/N]: " DELETE
+        DELETE=${DELETE:-N}
         if [[ "$DELETE" =~ ^[Yy]$ ]]; then
             log "Deleting existing tunnel(s)..."
             echo "$EXISTING_TUNNEL_IDS" | while read -r tid; do
