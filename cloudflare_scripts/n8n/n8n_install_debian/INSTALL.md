@@ -44,37 +44,17 @@ wget https://raw.githubusercontent.com/YOUR-USERNAME/YOUR-REPO/main/scripts_git/
 curl -O https://raw.githubusercontent.com/YOUR-USERNAME/YOUR-REPO/main/scripts_git/cloudflare_scripts/n8n/n8n_install_debian/setup.sh
 ```
 
-### Вариант 5: Создать download.sh скрипт
+### Вариант 5: Через download.sh (автоматический)
 ```bash
-# Создать скрипт для автоматического скачивания
-cat > download-n8n-setup.sh <<'EOF'
-#!/bin/bash
-BASE_URL="https://raw.githubusercontent.com/YOUR-USERNAME/YOUR-REPO/main/scripts_git/cloudflare_scripts/n8n/n8n_install_debian"
-FILES=(
-    "setup.sh"
-    "install-packages.sh"
-    "generate-config.sh"
-    "setup-cloudflare-tunnel.sh"
-    "docker-compose.yml"
-    ".env.example"
-    "README.md"
-)
+# Скачать download.sh скрипт
+wget https://raw.githubusercontent.com/YOUR-USERNAME/YOUR-REPO/main/scripts_git/cloudflare_scripts/n8n/n8n_install_debian/download.sh
 
-mkdir -p n8n_install_debian
+# Запустить
+chmod +x download.sh
+./download.sh
+
+# Перейти в созданную папку
 cd n8n_install_debian
-
-for file in "${FILES[@]}"; do
-    echo "Downloading $file..."
-    wget -q "$BASE_URL/$file"
-done
-
-chmod +x *.sh
-echo "✅ All files downloaded to $(pwd)"
-ls -lh
-EOF
-
-chmod +x download-n8n-setup.sh
-./download-n8n-setup.sh
 ```
 
 ---
