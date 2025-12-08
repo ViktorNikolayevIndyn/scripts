@@ -322,6 +322,20 @@ EOF
 
 log "Created docker-compose.yml"
 
+# Copy setup-cloudflare-tunnel.sh if it exists
+TUNNEL_SCRIPT="setup-cloudflare-tunnel.sh"
+if [[ -n "$SETUP_SCRIPT_DIR" ]] && [[ -f "$SETUP_SCRIPT_DIR/$TUNNEL_SCRIPT" ]]; then
+    cp "$SETUP_SCRIPT_DIR/$TUNNEL_SCRIPT" "$N8N_DIR/$TUNNEL_SCRIPT"
+    chmod +x "$N8N_DIR/$TUNNEL_SCRIPT"
+    log "✓ Copied $TUNNEL_SCRIPT to $N8N_DIR"
+elif [[ -f "$(dirname "$0")/$TUNNEL_SCRIPT" ]]; then
+    cp "$(dirname "$0")/$TUNNEL_SCRIPT" "$N8N_DIR/$TUNNEL_SCRIPT"
+    chmod +x "$N8N_DIR/$TUNNEL_SCRIPT"
+    log "✓ Copied $TUNNEL_SCRIPT to $N8N_DIR"
+else
+    log "⚠ $TUNNEL_SCRIPT not found (optional)"
+fi
+
 # Set permissions
 chown -R "$N8N_USER":"$N8N_USER" "$N8N_DIR"
 
@@ -439,17 +453,23 @@ echo ""
 echo "=========================================="
 echo "  Access Information"
 echo "=========================================="
-echo "n8n URL: https://${N8N_HOSTNAME}"
-echo "Username: ${N8N_AUTH_USER}"
-echo "Password: (as configured)"
+echo "n8n URL: https://${N8N_HOST}"
+echo "Username: ${N8N_BASIC_AUTH_USER}"
+echo "Password: ${N8N_BASIC_AUTH_PASSWORD}"
 echo ""
 echo "Configuration directory: $N8N_DIR"
 echo "Logs: $LOGFILE"
 echo ""
+echo "Next steps:"
+if [[ -f "$N8N_DIR/setup-cloudflare-tunnel.sh" ]]; then
+    echo "  1. Configure Cloudflare Tunnel (alternative method):"
+    echo "     cd $N8N_DIR && ./setup-cloudflare-tunnel.sh"
+    echo ""
+fi
 echo "Useful commands:"
-echo "  - Check n8n logs: cd $N8N_DIR && docker compose logs -f"
-echo "  - Restart n8n: cd $N8N_DIR && docker compose restart"
-echo "  - Stop n8n: cd $N8N_DIR && docker compose down"
+echo "  - Check n8n logs: docker compose -f $N8N_DIR/docker-compose.yml logs -f n8n"
+echo "  - Restart n8n: docker compose -f $N8N_DIR/docker-compose.yml restart"
+echo "  - Stop n8n: docker compose -f $N8N_DIR/docker-compose.yml down"
 echo "  - Cloudflare status: systemctl status cloudflared"
 echo "=========================================="
 
