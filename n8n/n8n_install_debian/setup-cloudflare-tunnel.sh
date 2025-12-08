@@ -167,13 +167,41 @@ EOF
 
 success "Configuration saved to $CONFIG_DIR/config.yml"
 
-# 🌍 Create DNS record
-log "Configuring DNS record..."
-if "$CLOUDFLARED_BIN" tunnel route dns "$TUNNEL_NAME" "$DOMAIN" 2>&1 | grep -q -E '(created|already exists)'; then
-  success "DNS record configured for $DOMAIN"
+# 🌍 Configure DNS record
+log "Configuring DNS record for $DOMAIN..."
+
+# Get zone ID and check if record exists
+DOMAIN_PARTS=(${DOMAIN//./ })
+if [ ${#DOMAIN_PARTS[@]} -ge 2 ]; then
+    ROOT_DOMAIN="${DOMAIN_PARTS[-2]}.${DOMAIN_PARTS[-1]}"
+    SUBDOMAIN="${DOMAIN%.$ROOT_DOMAIN}"
+    
+    log "Root domain: $ROOT_DOMAIN"
+    log "Subdomain: $SUBDOMAIN"
+fi
+
+# Try to create/update DNS via cloudflared
+DNS_OUTPUT=$("$CLOUDFLARED_BIN" tunnel route dns "$TUNNEL_NAME" "$DOMAIN" 2>&1)
+
+if echo "$DNS_OUTPUT" | grep -q -E '(created|already exists|Successfully)'; then
+    success "DNS record configured for $DOMAIN"
+elif echo "$DNS_OUTPUT" | grep -q "already exists"; then
+    log "DNS record already exists, updating tunnel route..."
+    # Delete old route if exists
+    "$CLOUDFLARED_BIN" tunnel route dns --overwrite-dns "$TUNNEL_NAME" "$DOMAIN" 2>&1 || true
+    success "DNS record updated for $DOMAIN"
 else
-  warning "DNS record might already exist or failed to create"
-  echo "You may need to manually check Cloudflare DNS settings"
+    warning "Could not automatically configure DNS"
+    log "DNS output: $DNS_OUTPUT"
+    echo ""
+    echo "⚠️  Please configure DNS manually:"
+    echo "   1. Go to Cloudflare Dashboard → DNS"
+    echo "   2. Add CNAME record:"
+    echo "      Name: $SUBDOMAIN"
+    echo "      Target: $TUNNEL_ID.cfargotunnel.com"
+    echo "      Proxy: Enabled (orange cloud)"
+    echo ""
+    read -p "Press Enter when DNS is configured..."
 fi
 
 # ⚙️ Create systemd service
