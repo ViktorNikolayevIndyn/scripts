@@ -382,6 +382,8 @@ else
                 fi
             done
             success "Old tunnel(s) deleted"
+            log "Waiting 3 seconds for Cloudflare API to propagate changes..."
+            sleep 3
         else
             log "Using first existing tunnel..."
             TUNNEL_ID=$(echo "$EXISTING_TUNNEL_IDS" | head -n1)
