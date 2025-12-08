@@ -350,24 +350,41 @@ else
     
     # Check if result exists and is an array
     if echo "$TUNNELS_RESPONSE" | jq -e '.result' >/dev/null 2>&1; then
-        EXISTING_TUNNEL_ID=$(echo "$TUNNELS_RESPONSE" | jq -r ".result[]? | select(.name == \"$TUNNEL_NAME\") | .id // empty")
+        # Get all tunnel IDs with this name
+        EXISTING_TUNNEL_IDS=$(echo "$TUNNELS_RESPONSE" | jq -r ".result[]? | select(.name == \"$TUNNEL_NAME\") | .id")
     else
-        EXISTING_TUNNEL_ID=""
+        EXISTING_TUNNEL_IDS=""
     fi
     
-    if [ -n "$EXISTING_TUNNEL_ID" ]; then
-        warning "Tunnel '$TUNNEL_NAME' already exists (ID: $EXISTING_TUNNEL_ID)"
-        read -p "Delete and recreate? [Y/n]: " DELETE
+    if [ -n "$EXISTING_TUNNEL_IDS" ]; then
+        # Count tunnels
+        TUNNEL_COUNT=$(echo "$EXISTING_TUNNEL_IDS" | wc -l)
+        
+        if [ "$TUNNEL_COUNT" -gt 1 ]; then
+            warning "Found $TUNNEL_COUNT tunnels with name '$TUNNEL_NAME'"
+            echo "$EXISTING_TUNNEL_IDS" | while read -r tid; do
+                log "  - ID: $tid"
+            done
+        else
+            warning "Tunnel '$TUNNEL_NAME' already exists (ID: $EXISTING_TUNNEL_IDS)"
+        fi
+        
+        read -p "Delete all and recreate? [Y/n]: " DELETE
         DELETE=${DELETE:-Y}
         if [[ "$DELETE" =~ ^[Yy]$ ]]; then
-            log "Deleting existing tunnel..."
-            curl -s -X DELETE "https://api.cloudflare.com/client/v4/accounts/$CF_ACCOUNT_ID/cfd_tunnel/$EXISTING_TUNNEL_ID" \
-                -H "Authorization: Bearer $CF_API_TOKEN" \
-                -H "Content-Type: application/json" > /dev/null
-            success "Old tunnel deleted"
+            log "Deleting existing tunnel(s)..."
+            echo "$EXISTING_TUNNEL_IDS" | while read -r tid; do
+                if [ -n "$tid" ]; then
+                    log "Deleting tunnel $tid..."
+                    curl -s -X DELETE "https://api.cloudflare.com/client/v4/accounts/$CF_ACCOUNT_ID/cfd_tunnel/$tid" \
+                        -H "Authorization: Bearer $CF_API_TOKEN" \
+                        -H "Content-Type: application/json" > /dev/null
+                fi
+            done
+            success "Old tunnel(s) deleted"
         else
-            log "Using existing tunnel..."
-            TUNNEL_ID="$EXISTING_TUNNEL_ID"
+            log "Using first existing tunnel..."
+            TUNNEL_ID=$(echo "$EXISTING_TUNNEL_IDS" | head -n1)
         fi
     fi
 fi
