@@ -107,14 +107,42 @@ log "Installing Cloudflared..."
 
 CLOUDFLARED_BIN="/usr/local/bin/cloudflared"
 
+# Stop any running cloudflared processes before installation
+log "Checking for running cloudflared processes..."
+if pgrep -x cloudflared > /dev/null; then
+    log "Stopping running cloudflared processes..."
+    pkill -9 cloudflared 2>/dev/null || true
+    sleep 2
+    log "✓ Stopped cloudflared processes"
+fi
+
+# Stop cloudflared services if they exist
+for service in cloudflared cloudflared.service cloudflared-n8n-tunnel; do
+    if systemctl is-active --quiet "$service" 2>/dev/null; then
+        log "Stopping $service..."
+        systemctl stop "$service" 2>/dev/null || true
+    fi
+done
+
 if [ ! -f "$CLOUDFLARED_BIN" ]; then
     curl -L --output "$CLOUDFLARED_BIN" \
         https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64 \
         >> "$LOGFILE" 2>&1 || error_exit "Failed to download cloudflared"
     
     chmod +x "$CLOUDFLARED_BIN"
+    log "✓ Cloudflared installed"
 else
-    log "✓ Cloudflared already installed"
+    log "Cloudflared already exists, updating..."
+    # Remove old binary
+    rm -f "$CLOUDFLARED_BIN"
+    
+    # Download new version
+    curl -L --output "$CLOUDFLARED_BIN" \
+        https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64 \
+        >> "$LOGFILE" 2>&1 || error_exit "Failed to download cloudflared"
+    
+    chmod +x "$CLOUDFLARED_BIN"
+    log "✓ Cloudflared updated"
 fi
 
 # Verify cloudflared
