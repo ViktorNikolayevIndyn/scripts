@@ -1,0 +1,236 @@
+#!/bin/bash
+#
+# Cloudflare Tunnel Setup для n8n
+# Адаптированная версия для автоматической настройки
+#
+
+set -e
+
+# 🔧 Default settings
+TUNNEL_NAME_DEFAULT="n8n-tunnel"
+LOCAL_URL_DEFAULT="http://localhost:80"
+CONFIG_DIR="/root/.cloudflared"
+CLOUDFLARED_BIN="/usr/local/bin/cloudflared"
+
+# Color output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+CYAN='\033[0;36m'
+NC='\033[0m' # No Color
+
+log() {
+    echo -e "${CYAN}[$(date +'%Y-%m-%d %H:%M:%S')]${NC} $*"
+}
+
+error() {
+    echo -e "${RED}❌ ERROR:${NC} $*" >&2
+}
+
+success() {
+    echo -e "${GREEN}✅${NC} $*"
+}
+
+warning() {
+    echo -e "${YELLOW}⚠️${NC} $*"
+}
+
+# Check if running as root
+if [[ $EUID -ne 0 ]]; then
+   error "This script must be run as root"
+   exit 1
+fi
+
+# 📦 Dependency check & install
+check_dependency() {
+  if ! command -v "$1" >/dev/null 2>&1; then
+    log "Installing $1..."
+    apt update -qq && apt install -y "$1" > /dev/null 2>&1
+  fi
+}
+
+log "Checking dependencies..."
+check_dependency curl
+check_dependency jq
+check_dependency uuidgen
+
+# Install cloudflared if not present
+if [ ! -f "$CLOUDFLARED_BIN" ]; then
+    log "Installing cloudflared..."
+    curl -L --output "$CLOUDFLARED_BIN" \
+        https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64
+    chmod +x "$CLOUDFLARED_BIN"
+    success "cloudflared installed"
+else
+    success "cloudflared already installed"
+fi
+
+mkdir -p "$CONFIG_DIR"
+
+# 🔐 Authentication
+if [ ! -f "$CONFIG_DIR/cert.pem" ]; then
+  echo ""
+  warning "Cloudflare authentication required!"
+  log "Opening browser for authentication..."
+  echo ""
+  echo "Please follow these steps:"
+  echo "1. A browser window will open"
+  echo "2. Log in to your Cloudflare account"
+  echo "3. Authorize the tunnel"
+  echo ""
+  read -p "Press Enter to continue..."
+  
+  "$CLOUDFLARED_BIN" login &
+  
+  log "Waiting for authentication..."
+  TIMEOUT=300  # 5 minutes timeout
+  ELAPSED=0
+  while [ ! -f "$CONFIG_DIR/cert.pem" ]; do
+    sleep 2
+    ELAPSED=$((ELAPSED + 2))
+    if [ $ELAPSED -gt $TIMEOUT ]; then
+        error "Authentication timeout. Please try again."
+        exit 1
+    fi
+  done
+  success "Authentication completed"
+else
+  success "Already authenticated with Cloudflare"
+fi
+
+# 📥 Input
+echo ""
+log "Tunnel Configuration"
+echo ""
+
+read -p "🔤 Tunnel name [$TUNNEL_NAME_DEFAULT]: " TUNNEL_NAME
+TUNNEL_NAME=${TUNNEL_NAME:-$TUNNEL_NAME_DEFAULT}
+
+read -p "🌐 Your domain (e.g., n8n.example.com): " DOMAIN
+if [ -z "$DOMAIN" ]; then
+    error "Domain is required!"
+    exit 1
+fi
+
+read -p "🔁 Local URL [$LOCAL_URL_DEFAULT]: " LOCAL_URL
+LOCAL_URL=${LOCAL_URL:-$LOCAL_URL_DEFAULT}
+
+# 🗑 Remove existing tunnel (if any)
+if "$CLOUDFLARED_BIN" tunnel list 2>/dev/null | grep -q "$TUNNEL_NAME"; then
+  warning "Tunnel '$TUNNEL_NAME' already exists"
+  read -p "Delete and recreate? [Y/n]: " DELETE
+  DELETE=${DELETE:-Y}
+  if [[ "$DELETE" =~ ^[Yy]$ ]]; then
+    log "Deleting existing tunnel..."
+    "$CLOUDFLARED_BIN" tunnel delete "$TUNNEL_NAME" 2>/dev/null || true
+    success "Old tunnel deleted"
+  else
+    log "Using existing tunnel..."
+    TUNNEL_ID=$("$CLOUDFLARED_BIN" tunnel list | grep "$TUNNEL_NAME" | awk '{print $1}')
+  fi
+fi
+
+# 🔧 Create tunnel if needed
+if [ -z "$TUNNEL_ID" ]; then
+    log "Creating new tunnel '$TUNNEL_NAME'..."
+    TUNNEL_OUTPUT=$("$CLOUDFLARED_BIN" tunnel create "$TUNNEL_NAME" 2>&1)
+    
+    TUNNEL_ID=$(echo "$TUNNEL_OUTPUT" | grep -oP 'Created tunnel .* with id \K[\w-]+')
+    
+    if [ -z "$TUNNEL_ID" ]; then
+        error "Failed to create tunnel"
+        echo "$TUNNEL_OUTPUT"
+        exit 1
+    fi
+    
+    success "Tunnel created with ID: $TUNNEL_ID"
+fi
+
+CREDENTIAL_FILE="$CONFIG_DIR/$TUNNEL_ID.json"
+
+if [ ! -f "$CREDENTIAL_FILE" ]; then
+  error "Credentials file not found: $CREDENTIAL_FILE"
+  exit 1
+fi
+
+# 💾 Write config.yml
+log "Saving tunnel configuration..."
+cat > "$CONFIG_DIR/config.yml" <<EOF
+tunnel: $TUNNEL_ID
+credentials-file: $CREDENTIAL_FILE
+
+ingress:
+  - hostname: $DOMAIN
+    service: $LOCAL_URL
+  - service: http_status:404
+EOF
+
+success "Configuration saved to $CONFIG_DIR/config.yml"
+
+# 🌍 Create DNS record
+log "Configuring DNS record..."
+if "$CLOUDFLARED_BIN" tunnel route dns "$TUNNEL_NAME" "$DOMAIN" 2>&1 | grep -q -E '(created|already exists)'; then
+  success "DNS record configured for $DOMAIN"
+else
+  warning "DNS record might already exist or failed to create"
+  echo "You may need to manually check Cloudflare DNS settings"
+fi
+
+# ⚙️ Create systemd service
+SERVICE_FILE="/etc/systemd/system/cloudflared-$TUNNEL_NAME.service"
+
+log "Creating systemd service..."
+cat > "$SERVICE_FILE" <<EOF
+[Unit]
+Description=Cloudflare Tunnel - $TUNNEL_NAME (n8n)
+After=network.target
+
+[Service]
+Type=simple
+User=root
+ExecStart=$CLOUDFLARED_BIN tunnel --config $CONFIG_DIR/config.yml run $TUNNEL_NAME
+Restart=on-failure
+RestartSec=5s
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+# Reload and enable service
+systemctl daemon-reload
+systemctl enable "cloudflared-$TUNNEL_NAME.service" > /dev/null 2>&1
+systemctl restart "cloudflared-$TUNNEL_NAME.service"
+
+sleep 2
+
+# Check service status
+if systemctl is-active --quiet "cloudflared-$TUNNEL_NAME.service"; then
+    success "Cloudflare Tunnel service is running"
+else
+    warning "Service may not be running properly"
+    echo "Check status with: systemctl status cloudflared-$TUNNEL_NAME.service"
+fi
+
+# ✅ Summary
+echo ""
+echo "=========================================="
+echo "  🎉 Cloudflare Tunnel Setup Complete!"
+echo "=========================================="
+echo ""
+echo "Tunnel Name:    $TUNNEL_NAME"
+echo "Tunnel ID:      $TUNNEL_ID"
+echo "Domain:         https://$DOMAIN"
+echo "Local Service:  $LOCAL_URL"
+echo "Config File:    $CONFIG_DIR/config.yml"
+echo "Service:        cloudflared-$TUNNEL_NAME.service"
+echo ""
+echo "Useful commands:"
+echo "  Status:  systemctl status cloudflared-$TUNNEL_NAME.service"
+echo "  Logs:    journalctl -u cloudflared-$TUNNEL_NAME.service -f"
+echo "  Restart: systemctl restart cloudflared-$TUNNEL_NAME.service"
+echo "  Stop:    systemctl stop cloudflared-$TUNNEL_NAME.service"
+echo ""
+echo "Your n8n instance should now be accessible at:"
+echo "  https://$DOMAIN"
+echo ""
+echo "=========================================="

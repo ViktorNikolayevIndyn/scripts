@@ -1,0 +1,38 @@
+LXC ubuntu 20.04
+
+
+
+install docker 
+sudo apt-get update
+
+sudo apt install -y apt-transport-https ca-certificates curl software-properties-common
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+apt update
+apt-cache policy docker-ce
+apt install -y docker-ce
+usermod -aG docker ${USER}
+
+
+ufw allow 80,443,3000,996,7946,4789,2377/tcp
+ufw allow 7946,4789,2377/udp
+
+# 2) Старт CapRover с нужными флагами
+docker run -d --name caprover --restart=always \
+  -p 3000:3000 -p 80:80 -p 443:443 \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  -v /captain:/captain \
+  -e ACCEPTED_TERMS=true \
+  -e BY_PASS_PROXY_CHECK=TRUE \
+  -e MAIN_NODE_IP_ADDRESS=127.0.0.1 \
+  caprover/caprover:latest
+
+  http://[IP_OF_YOUR_SERVER]:3000
+  default pass: captain42 
+
+
+  cloudflared installed
+
+wget -q https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb
+dpkg -i cloudflared-linux-amd64.deb
+cloudflared --version
