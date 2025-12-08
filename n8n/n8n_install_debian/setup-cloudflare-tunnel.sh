@@ -402,6 +402,25 @@ else
         else
             log "Using first existing tunnel..."
             TUNNEL_ID=$(echo "$EXISTING_TUNNEL_IDS" | head -n1)
+            
+            # Download credentials for existing tunnel
+            log "Downloading credentials for tunnel $TUNNEL_ID..."
+            TUNNEL_TOKEN_RESPONSE=$(curl -s "https://api.cloudflare.com/client/v4/accounts/$CF_ACCOUNT_ID/cfd_tunnel/$TUNNEL_ID/token" \
+                -H "Authorization: Bearer $CF_API_TOKEN")
+            
+            TUNNEL_TOKEN=$(echo "$TUNNEL_TOKEN_RESPONSE" | jq -r '.result // empty')
+            
+            if [ -n "$TUNNEL_TOKEN" ]; then
+                # Decode the tunnel token to get credentials
+                echo "$TUNNEL_TOKEN" | base64 -d 2>/dev/null > "$CONFIG_DIR/$TUNNEL_ID.json" || {
+                    # If base64 decode fails, the token might already be in JSON format
+                    echo "$TUNNEL_TOKEN" > "$CONFIG_DIR/$TUNNEL_ID.json"
+                }
+                chmod 600 "$CONFIG_DIR/$TUNNEL_ID.json"
+                success "Credentials downloaded"
+            else
+                warning "Could not download credentials, will try to use existing file"
+            fi
         fi
     fi
 fi
