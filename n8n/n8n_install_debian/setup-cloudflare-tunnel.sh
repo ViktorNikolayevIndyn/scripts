@@ -246,23 +246,42 @@ log "Tunnel Configuration"
 echo ""
 
 # Check if .env exists and load defaults
-ENV_FILE="/opt/n8n/.env"
 N8N_HOST_DEFAULT=""
 USE_ENV_DEFAULTS=false
 
-if [ -f "$ENV_FILE" ]; then
-    log "Found existing .env configuration"
+# Try multiple possible locations
+ENV_LOCATIONS=(
+    "/opt/n8n/.env"
+    "$N8N_DIR/.env"
+    "$(dirname "$0")/.env"
+    ".env"
+)
+
+ENV_FILE=""
+for location in "${ENV_LOCATIONS[@]}"; do
+    if [ -f "$location" ]; then
+        ENV_FILE="$location"
+        break
+    fi
+done
+
+if [ -n "$ENV_FILE" ] && [ -f "$ENV_FILE" ]; then
+    log "Found existing .env at: $ENV_FILE"
     read -p "Use domain from .env as default? [Y/n]: " USE_ENV
     USE_ENV=${USE_ENV:-Y}
     
     if [[ "$USE_ENV" =~ ^[Yy]$ ]]; then
         # Load N8N_HOST from .env
-        N8N_HOST_DEFAULT=$(grep "^N8N_HOST=" "$ENV_FILE" | cut -d'=' -f2 | tr -d '"' | tr -d "'")
+        N8N_HOST_DEFAULT=$(grep "^N8N_HOST=" "$ENV_FILE" | cut -d'=' -f2 | tr -d '"' | tr -d "'" | sed 's/^https\?:\/\///')
         USE_ENV_DEFAULTS=true
         if [ -n "$N8N_HOST_DEFAULT" ]; then
             success "Loaded domain from .env: $N8N_HOST_DEFAULT"
+        else
+            warning ".env found but N8N_HOST not set"
         fi
     fi
+else
+    log "No .env file found (checked: ${ENV_LOCATIONS[*]})"
 fi
 
 read -p "🔤 Tunnel name [$TUNNEL_NAME_DEFAULT]: " TUNNEL_NAME
@@ -341,10 +360,19 @@ if [ -z "$TUNNEL_ID" ]; then
             -H "Content-Type: application/json" \
             --data "{\"name\":\"$TUNNEL_NAME\",\"tunnel_secret\":\"$TUNNEL_SECRET\"}")
         
+        # Check if API call was successful
+        API_SUCCESS=$(echo "$TUNNEL_RESPONSE" | jq -r '.success // false')
+        
+        if [ "$API_SUCCESS" != "true" ]; then
+            error "Failed to create tunnel via API"
+            echo "$TUNNEL_RESPONSE" | jq '.'
+            exit 1
+        fi
+        
         TUNNEL_ID=$(echo "$TUNNEL_RESPONSE" | jq -r '.result.id // empty')
         
         if [ -z "$TUNNEL_ID" ]; then
-            error "Failed to create tunnel via API"
+            error "Failed to extract tunnel ID from response"
             echo "Response: $TUNNEL_RESPONSE"
             exit 1
         fi
