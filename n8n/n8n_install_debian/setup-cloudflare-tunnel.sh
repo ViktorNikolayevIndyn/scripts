@@ -170,7 +170,7 @@ success "Configuration saved to $CONFIG_DIR/config.yml"
 # 🌍 Configure DNS record
 log "Configuring DNS record for $DOMAIN..."
 
-# Get zone ID and check if record exists
+# Parse domain
 DOMAIN_PARTS=(${DOMAIN//./ })
 if [ ${#DOMAIN_PARTS[@]} -ge 2 ]; then
     ROOT_DOMAIN="${DOMAIN_PARTS[-2]}.${DOMAIN_PARTS[-1]}"
@@ -180,25 +180,89 @@ if [ ${#DOMAIN_PARTS[@]} -ge 2 ]; then
     log "Subdomain: $SUBDOMAIN"
 fi
 
-# Try to create/update DNS via cloudflared
+TUNNEL_TARGET="$TUNNEL_ID.cfargotunnel.com"
+
+# Method 1: Try cloudflared tunnel route dns
+log "Attempting automatic DNS configuration via cloudflared..."
 DNS_OUTPUT=$("$CLOUDFLARED_BIN" tunnel route dns "$TUNNEL_NAME" "$DOMAIN" 2>&1)
 
 if echo "$DNS_OUTPUT" | grep -q -E '(created|already exists|Successfully)'; then
     success "DNS record configured for $DOMAIN"
 elif echo "$DNS_OUTPUT" | grep -q "already exists"; then
-    log "DNS record already exists, updating tunnel route..."
-    # Delete old route if exists
-    "$CLOUDFLARED_BIN" tunnel route dns --overwrite-dns "$TUNNEL_NAME" "$DOMAIN" 2>&1 || true
-    success "DNS record updated for $DOMAIN"
+    log "DNS record already exists"
+    
+    # Ask if user wants to update via API
+    echo ""
+    read -p "Update DNS record via Cloudflare API? [y/N]: " USE_API
+    
+    if [[ "$USE_API" =~ ^[Yy]$ ]]; then
+        # Method 2: Use Cloudflare API
+        read -p "Enter Cloudflare API Token (with DNS edit permissions): " CF_API_TOKEN
+        
+        if [ -n "$CF_API_TOKEN" ]; then
+            log "Fetching Zone ID for $ROOT_DOMAIN..."
+            
+            ZONE_RESPONSE=$(curl -s -X GET "https://api.cloudflare.com/client/v4/zones?name=$ROOT_DOMAIN" \
+                -H "Authorization: Bearer $CF_API_TOKEN" \
+                -H "Content-Type: application/json")
+            
+            ZONE_ID=$(echo "$ZONE_RESPONSE" | jq -r '.result[0].id // empty')
+            
+            if [ -z "$ZONE_ID" ]; then
+                warning "Could not find zone for $ROOT_DOMAIN"
+            else
+                log "Zone ID: $ZONE_ID"
+                
+                # Check if record exists
+                log "Checking existing DNS records..."
+                RECORDS_RESPONSE=$(curl -s -X GET \
+                    "https://api.cloudflare.com/client/v4/zones/$ZONE_ID/dns_records?name=$DOMAIN&type=CNAME" \
+                    -H "Authorization: Bearer $CF_API_TOKEN" \
+                    -H "Content-Type: application/json")
+                
+                RECORD_ID=$(echo "$RECORDS_RESPONSE" | jq -r '.result[0].id // empty')
+                
+                if [ -n "$RECORD_ID" ]; then
+                    log "Updating existing DNS record..."
+                    UPDATE_RESPONSE=$(curl -s -X PUT \
+                        "https://api.cloudflare.com/client/v4/zones/$ZONE_ID/dns_records/$RECORD_ID" \
+                        -H "Authorization: Bearer $CF_API_TOKEN" \
+                        -H "Content-Type: application/json" \
+                        --data "{\"type\":\"CNAME\",\"name\":\"$DOMAIN\",\"content\":\"$TUNNEL_TARGET\",\"proxied\":true}")
+                    
+                    if echo "$UPDATE_RESPONSE" | jq -e '.success' >/dev/null 2>&1; then
+                        success "DNS record updated via API"
+                    else
+                        warning "Failed to update DNS via API"
+                    fi
+                else
+                    log "Creating new DNS record..."
+                    CREATE_RESPONSE=$(curl -s -X POST \
+                        "https://api.cloudflare.com/client/v4/zones/$ZONE_ID/dns_records" \
+                        -H "Authorization: Bearer $CF_API_TOKEN" \
+                        -H "Content-Type: application/json" \
+                        --data "{\"type\":\"CNAME\",\"name\":\"$DOMAIN\",\"content\":\"$TUNNEL_TARGET\",\"proxied\":true}")
+                    
+                    if echo "$CREATE_RESPONSE" | jq -e '.success' >/dev/null 2>&1; then
+                        success "DNS record created via API"
+                    else
+                        warning "Failed to create DNS via API"
+                    fi
+                fi
+            fi
+        fi
+    else
+        success "Keeping existing DNS configuration"
+    fi
 else
     warning "Could not automatically configure DNS"
     log "DNS output: $DNS_OUTPUT"
     echo ""
     echo "⚠️  Please configure DNS manually:"
     echo "   1. Go to Cloudflare Dashboard → DNS"
-    echo "   2. Add CNAME record:"
+    echo "   2. Add/Update CNAME record:"
     echo "      Name: $SUBDOMAIN"
-    echo "      Target: $TUNNEL_ID.cfargotunnel.com"
+    echo "      Target: $TUNNEL_TARGET"
     echo "      Proxy: Enabled (orange cloud)"
     echo ""
     read -p "Press Enter when DNS is configured..."

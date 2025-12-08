@@ -152,6 +152,63 @@ else
     log "User $N8N_USER already exists"
 fi
 
+# Setup SSH key for n8n user
+N8N_HOME=$(eval echo ~"$N8N_USER")
+N8N_SSH_DIR="$N8N_HOME/.ssh"
+N8N_AUTH_KEYS="$N8N_SSH_DIR/authorized_keys"
+
+mkdir -p "$N8N_SSH_DIR"
+
+# Check if root has SSH keys
+ROOT_AUTH_KEYS="/root/.ssh/authorized_keys"
+if [ -f "$ROOT_AUTH_KEYS" ]; then
+    log "Found existing SSH keys in root account"
+    read -p "Copy root's SSH keys to $N8N_USER? [Y/n]: " COPY_KEYS
+    COPY_KEYS=${COPY_KEYS:-Y}
+    
+    if [[ "$COPY_KEYS" =~ ^[Yy]$ ]]; then
+        cat "$ROOT_AUTH_KEYS" >> "$N8N_AUTH_KEYS"
+        log "✓ Copied SSH keys from root to $N8N_USER"
+    fi
+fi
+
+# Ask for additional SSH key
+echo ""
+read -p "Add additional SSH public key for $N8N_USER? [y/N]: " ADD_KEY
+if [[ "$ADD_KEY" =~ ^[Yy]$ ]]; then
+    echo "Paste your SSH public key (starts with ssh-rsa, ssh-ed25519, etc.):"
+    read -r SSH_KEY
+    
+    if [ -n "$SSH_KEY" ]; then
+        # Validate SSH key format
+        if echo "$SSH_KEY" | ssh-keygen -l -f - >/dev/null 2>&1; then
+            echo "$SSH_KEY" >> "$N8N_AUTH_KEYS"
+            log "✓ Added SSH key to $N8N_USER"
+            
+            # Show key fingerprint
+            KEY_FINGERPRINT=$(echo "$SSH_KEY" | ssh-keygen -l -f - 2>/dev/null)
+            log "Key fingerprint: $KEY_FINGERPRINT"
+        else
+            warning "Invalid SSH key format, skipping..."
+        fi
+    fi
+fi
+
+# Set correct permissions
+if [ -f "$N8N_AUTH_KEYS" ]; then
+    chmod 700 "$N8N_SSH_DIR"
+    chmod 600 "$N8N_AUTH_KEYS"
+    chown -R "$N8N_USER":"$N8N_USER" "$N8N_SSH_DIR"
+    log "✓ SSH keys configured for $N8N_USER"
+else
+    warning "No SSH keys configured for $N8N_USER"
+    warning "You may lose access after SSH hardening!"
+    read -p "Continue anyway? [y/N]: " CONTINUE
+    if [[ ! "$CONTINUE" =~ ^[Yy]$ ]]; then
+        error_exit "Setup cancelled. Please add SSH keys first."
+    fi
+fi
+
 # SSH Hardening
 log "Configuring SSH security..."
 cp /etc/ssh/sshd_config /etc/ssh/sshd_config.backup
