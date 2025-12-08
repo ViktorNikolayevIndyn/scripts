@@ -91,14 +91,23 @@ n8n_install_debian/
 
 ---
 
-## ⚡ One-liner установка
+## ⚡ One-liner установка (рекомендуется)
 
 ```bash
-# Скачать и запустить setup.sh одной командой
-curl -fsSL https://raw.githubusercontent.com/YOUR-USERNAME/YOUR-REPO/main/scripts_git/cloudflare_scripts/n8n/n8n_install_debian/setup.sh | sudo bash
+# Скачать все файлы и запустить установку
+wget -qO- https://raw.githubusercontent.com/YOUR-USERNAME/YOUR-REPO/main/scripts_git/cloudflare_scripts/n8n/n8n_install_debian/download.sh | bash && cd n8n_install_debian && sudo bash setup.sh
 ```
 
-**⚠️ Внимание:** One-liner загружает только главный скрипт. Для полной установки нужны все файлы.
+Или по шагам:
+```bash
+# 1. Скачать все файлы
+wget https://raw.githubusercontent.com/YOUR-USERNAME/YOUR-REPO/main/scripts_git/cloudflare_scripts/n8n/n8n_install_debian/download.sh
+bash download.sh
+
+# 2. Запустить установку
+cd n8n_install_debian
+sudo bash setup.sh
+```
 
 ---
 
