@@ -67,35 +67,90 @@ fi
 
 mkdir -p "$CONFIG_DIR"
 
-# 🔐 Authentication
-if [ ! -f "$CONFIG_DIR/cert.pem" ]; then
-  echo ""
-  warning "Cloudflare authentication required!"
-  log "Opening browser for authentication..."
-  echo ""
-  echo "Please follow these steps:"
-  echo "1. A browser window will open"
-  echo "2. Log in to your Cloudflare account"
-  echo "3. Authorize the tunnel"
-  echo ""
-  read -p "Press Enter to continue..."
-  
-  "$CLOUDFLARED_BIN" login &
-  
-  log "Waiting for authentication..."
-  TIMEOUT=300  # 5 minutes timeout
-  ELAPSED=0
-  while [ ! -f "$CONFIG_DIR/cert.pem" ]; do
-    sleep 2
-    ELAPSED=$((ELAPSED + 2))
-    if [ $ELAPSED -gt $TIMEOUT ]; then
-        error "Authentication timeout. Please try again."
+# 🔐 Authentication Method Selection
+echo ""
+log "Choose authentication method:"
+echo "1. Cloudflare API Token (recommended for headless servers)"
+echo "2. Browser login (cloudflared login)"
+echo ""
+read -p "Select method [1/2]: " AUTH_METHOD
+AUTH_METHOD=${AUTH_METHOD:-1}
+
+USE_API=false
+CF_API_TOKEN=""
+CF_ACCOUNT_ID=""
+
+if [ "$AUTH_METHOD" = "1" ]; then
+    # API Token method
+    USE_API=true
+    echo ""
+    log "Using Cloudflare API authentication"
+    echo ""
+    echo "Get your API Token from:"
+    echo "https://dash.cloudflare.com/profile/api-tokens"
+    echo ""
+    echo "Token permissions needed:"
+    echo "  - Account → Cloudflare Tunnel → Edit"
+    echo "  - Zone → DNS → Edit"
+    echo ""
+    read -p "Enter Cloudflare API Token: " CF_API_TOKEN
+    
+    if [ -z "$CF_API_TOKEN" ]; then
+        error "API Token is required"
         exit 1
     fi
-  done
-  success "Authentication completed"
+    
+    # Get Account ID
+    log "Fetching account information..."
+    ACCOUNTS_RESPONSE=$(curl -s -X GET "https://api.cloudflare.com/client/v4/accounts" \
+        -H "Authorization: Bearer $CF_API_TOKEN" \
+        -H "Content-Type: application/json")
+    
+    CF_ACCOUNT_ID=$(echo "$ACCOUNTS_RESPONSE" | jq -r '.result[0].id // empty')
+    
+    if [ -z "$CF_ACCOUNT_ID" ]; then
+        error "Could not fetch account ID. Check your API token permissions."
+        echo "Response: $ACCOUNTS_RESPONSE"
+        exit 1
+    fi
+    
+    log "Account ID: $CF_ACCOUNT_ID"
+    success "API authentication successful"
+    
+elif [ "$AUTH_METHOD" = "2" ]; then
+    # Browser login method
+    if [ ! -f "$CONFIG_DIR/cert.pem" ]; then
+        echo ""
+        warning "Cloudflare authentication required!"
+        log "Opening browser for authentication..."
+        echo ""
+        echo "Please follow these steps:"
+        echo "1. A browser window will open"
+        echo "2. Log in to your Cloudflare account"
+        echo "3. Authorize the tunnel"
+        echo ""
+        read -p "Press Enter to continue..."
+        
+        "$CLOUDFLARED_BIN" login &
+        
+        log "Waiting for authentication..."
+        TIMEOUT=300  # 5 minutes timeout
+        ELAPSED=0
+        while [ ! -f "$CONFIG_DIR/cert.pem" ]; do
+            sleep 2
+            ELAPSED=$((ELAPSED + 2))
+            if [ $ELAPSED -gt $TIMEOUT ]; then
+                error "Authentication timeout. Please try again."
+                exit 1
+            fi
+        done
+        success "Authentication completed"
+    else
+        success "Already authenticated with Cloudflare"
+    fi
 else
-  success "Already authenticated with Cloudflare"
+    error "Invalid selection"
+    exit 1
 fi
 
 # 📥 Input
@@ -116,31 +171,82 @@ read -p "🔁 Local URL [$LOCAL_URL_DEFAULT]: " LOCAL_URL
 LOCAL_URL=${LOCAL_URL:-$LOCAL_URL_DEFAULT}
 
 # 🗑 Remove existing tunnel (if any)
-if "$CLOUDFLARED_BIN" tunnel list 2>/dev/null | grep -q "$TUNNEL_NAME"; then
-  warning "Tunnel '$TUNNEL_NAME' already exists"
-  read -p "Delete and recreate? [Y/n]: " DELETE
-  DELETE=${DELETE:-Y}
-  if [[ "$DELETE" =~ ^[Yy]$ ]]; then
-    log "Deleting existing tunnel..."
-    "$CLOUDFLARED_BIN" tunnel delete "$TUNNEL_NAME" 2>/dev/null || true
-    success "Old tunnel deleted"
-  else
-    log "Using existing tunnel..."
-    TUNNEL_ID=$("$CLOUDFLARED_BIN" tunnel list | grep "$TUNNEL_NAME" | awk '{print $1}')
-  fi
+if [ "$USE_API" = false ]; then
+    # Check existing tunnel via CLI
+    if "$CLOUDFLARED_BIN" tunnel list 2>/dev/null | grep -q "$TUNNEL_NAME"; then
+      warning "Tunnel '$TUNNEL_NAME' already exists"
+      read -p "Delete and recreate? [Y/n]: " DELETE
+      DELETE=${DELETE:-Y}
+      if [[ "$DELETE" =~ ^[Yy]$ ]]; then
+        log "Deleting existing tunnel..."
+        "$CLOUDFLARED_BIN" tunnel delete "$TUNNEL_NAME" 2>/dev/null || true
+        success "Old tunnel deleted"
+      else
+        log "Using existing tunnel..."
+        TUNNEL_ID=$("$CLOUDFLARED_BIN" tunnel list | grep "$TUNNEL_NAME" | awk '{print $1}')
+      fi
+    fi
+else
+    # Check existing tunnel via API
+    TUNNELS_RESPONSE=$(curl -s -X GET "https://api.cloudflare.com/client/v4/accounts/$CF_ACCOUNT_ID/cfd_tunnel" \
+        -H "Authorization: Bearer $CF_API_TOKEN" \
+        -H "Content-Type: application/json")
+    
+    EXISTING_TUNNEL_ID=$(echo "$TUNNELS_RESPONSE" | jq -r ".result[] | select(.name == \"$TUNNEL_NAME\") | .id // empty")
+    
+    if [ -n "$EXISTING_TUNNEL_ID" ]; then
+        warning "Tunnel '$TUNNEL_NAME' already exists (ID: $EXISTING_TUNNEL_ID)"
+        read -p "Delete and recreate? [Y/n]: " DELETE
+        DELETE=${DELETE:-Y}
+        if [[ "$DELETE" =~ ^[Yy]$ ]]; then
+            log "Deleting existing tunnel..."
+            curl -s -X DELETE "https://api.cloudflare.com/client/v4/accounts/$CF_ACCOUNT_ID/cfd_tunnel/$EXISTING_TUNNEL_ID" \
+                -H "Authorization: Bearer $CF_API_TOKEN" \
+                -H "Content-Type: application/json" > /dev/null
+            success "Old tunnel deleted"
+        else
+            log "Using existing tunnel..."
+            TUNNEL_ID="$EXISTING_TUNNEL_ID"
+        fi
+    fi
 fi
 
-# 🔧 Create tunnel if needed
+# 🚇 Create tunnel if needed
 if [ -z "$TUNNEL_ID" ]; then
     log "Creating new tunnel '$TUNNEL_NAME'..."
-    TUNNEL_OUTPUT=$("$CLOUDFLARED_BIN" tunnel create "$TUNNEL_NAME" 2>&1)
     
-    TUNNEL_ID=$(echo "$TUNNEL_OUTPUT" | grep -oP 'Created tunnel .* with id \K[\w-]+')
-    
-    if [ -z "$TUNNEL_ID" ]; then
-        error "Failed to create tunnel"
-        echo "$TUNNEL_OUTPUT"
-        exit 1
+    if [ "$USE_API" = true ]; then
+        # Create tunnel via API
+        TUNNEL_SECRET=$(openssl rand -base64 32)
+        TUNNEL_RESPONSE=$(curl -s -X POST "https://api.cloudflare.com/client/v4/accounts/$CF_ACCOUNT_ID/cfd_tunnel" \
+            -H "Authorization: Bearer $CF_API_TOKEN" \
+            -H "Content-Type: application/json" \
+            --data "{\"name\":\"$TUNNEL_NAME\",\"tunnel_secret\":\"$TUNNEL_SECRET\"}")
+        
+        TUNNEL_ID=$(echo "$TUNNEL_RESPONSE" | jq -r '.result.id // empty')
+        
+        if [ -z "$TUNNEL_ID" ]; then
+            error "Failed to create tunnel via API"
+            echo "Response: $TUNNEL_RESPONSE"
+            exit 1
+        fi
+        
+        # Save tunnel credentials
+        TUNNEL_CREDS="{\"AccountTag\":\"$CF_ACCOUNT_ID\",\"TunnelSecret\":\"$TUNNEL_SECRET\",\"TunnelID\":\"$TUNNEL_ID\"}"
+        echo "$TUNNEL_CREDS" > "$CONFIG_DIR/$TUNNEL_ID.json"
+        chmod 600 "$CONFIG_DIR/$TUNNEL_ID.json"
+        
+    else
+        # Create tunnel via CLI
+        TUNNEL_OUTPUT=$("$CLOUDFLARED_BIN" tunnel create "$TUNNEL_NAME" 2>&1)
+        
+        TUNNEL_ID=$(echo "$TUNNEL_OUTPUT" | grep -oP 'Created tunnel .* with id \K[\w-]+')
+        
+        if [ -z "$TUNNEL_ID" ]; then
+            error "Failed to create tunnel"
+            echo "$TUNNEL_OUTPUT"
+            exit 1
+        fi
     fi
     
     success "Tunnel created with ID: $TUNNEL_ID"
@@ -191,15 +297,19 @@ if echo "$DNS_OUTPUT" | grep -q -E '(created|already exists|Successfully)'; then
 elif echo "$DNS_OUTPUT" | grep -q "already exists"; then
     log "DNS record already exists"
     
-    # Ask if user wants to update via API
-    echo ""
-    read -p "Update DNS record via Cloudflare API? [y/N]: " USE_API
-    
-    if [[ "$USE_API" =~ ^[Yy]$ ]]; then
-        # Method 2: Use Cloudflare API
-        read -p "Enter Cloudflare API Token (with DNS edit permissions): " CF_API_TOKEN
+    # Ask if user wants to update via API (if not already using API auth)
+    if [ "$USE_API" = false ]; then
+        echo ""
+        read -p "Update DNS record via Cloudflare API? [y/N]: " USE_DNS_API
         
-        if [ -n "$CF_API_TOKEN" ]; then
+        if [[ "$USE_DNS_API" =~ ^[Yy]$ ]]; then
+            # Method 2: Use Cloudflare API
+            read -p "Enter Cloudflare API Token (with DNS edit permissions): " CF_API_TOKEN
+        fi
+    fi
+    
+    # Use API if enabled (either from tunnel auth or DNS-only)
+    if [ -n "$CF_API_TOKEN" ]; then
             log "Fetching Zone ID for $ROOT_DOMAIN..."
             
             ZONE_RESPONSE=$(curl -s -X GET "https://api.cloudflare.com/client/v4/zones?name=$ROOT_DOMAIN" \
