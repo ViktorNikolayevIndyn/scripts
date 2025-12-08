@@ -19,17 +19,60 @@ error() { echo -e "${RED}✗${NC} $1"; }
 warning() { echo -e "${YELLOW}⚠${NC} $1"; }
 
 # ============================================================================
-# Check for API Token
+# Check for saved credentials
 # ============================================================================
 
-if [ -z "$CF_API_TOKEN" ]; then
+CONFIG_FILE="/root/.cloudflare-api-token"
+
+# Check environment variable
+if [ -n "$CF_API_TOKEN" ]; then
+    log "Using API Token from environment variable"
+# Check saved token file
+elif [ -f "$CONFIG_FILE" ]; then
+    CF_API_TOKEN=$(cat "$CONFIG_FILE")
+    log "Using saved API Token from $CONFIG_FILE"
+else
+    # Ask for token
     echo ""
-    log "Cloudflare API Token required"
+    log "Cloudflare authentication required"
     echo ""
-    read -p "Enter Cloudflare API Token: " CF_API_TOKEN
+    echo "Choose authentication method:"
+    echo "1. API Token (recommended)"
+    echo "2. cert.pem file (legacy)"
+    echo ""
+    read -p "Select method [1/2]: " AUTH_METHOD
+    AUTH_METHOD=${AUTH_METHOD:-1}
     
-    if [ -z "$CF_API_TOKEN" ]; then
-        error "API Token is required"
+    if [ "$AUTH_METHOD" = "1" ]; then
+        echo ""
+        log "Get your API Token from:"
+        echo "https://dash.cloudflare.com/profile/api-tokens"
+        echo ""
+        read -p "Enter Cloudflare API Token: " CF_API_TOKEN
+        
+        if [ -z "$CF_API_TOKEN" ]; then
+            error "API Token is required"
+            exit 1
+        fi
+        
+        # Ask to save token
+        echo ""
+        read -p "Save API Token for future use? [Y/n]: " SAVE_TOKEN
+        SAVE_TOKEN=${SAVE_TOKEN:-Y}
+        
+        if [[ "$SAVE_TOKEN" =~ ^[Yy]$ ]]; then
+            echo "$CF_API_TOKEN" > "$CONFIG_FILE"
+            chmod 600 "$CONFIG_FILE"
+            success "API Token saved to $CONFIG_FILE"
+        fi
+        
+    elif [ "$AUTH_METHOD" = "2" ]; then
+        # Use cert.pem method
+        error "cert.pem method not supported in this script"
+        echo "Use: cloudflared tunnel list"
+        exit 1
+    else
+        error "Invalid selection"
         exit 1
     fi
 fi

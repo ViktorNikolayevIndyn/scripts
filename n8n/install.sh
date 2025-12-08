@@ -69,6 +69,7 @@ FILES=(
     "generate-config.sh"
     "setup-cloudflare-tunnel.sh"
     "list-tunnels.sh"
+    "manage-api-token.sh"
     "docker-compose.yml"
     ".env.example"
 )
@@ -115,6 +116,14 @@ if [ -d "$INSTALL_DIR" ]; then
         chmod +x "$INSTALL_DIR/list-tunnels.sh"
         chown "$N8N_USER":"$N8N_USER" "$INSTALL_DIR/list-tunnels.sh" 2>/dev/null || true
         log "✓ list-tunnels.sh"
+    fi
+    
+    # Copy manage-api-token.sh
+    if [ -f "$WORK_DIR/manage-api-token.sh" ]; then
+        cp "$WORK_DIR/manage-api-token.sh" "$INSTALL_DIR/"
+        chmod +x "$INSTALL_DIR/manage-api-token.sh"
+        chown "$N8N_USER":"$N8N_USER" "$INSTALL_DIR/manage-api-token.sh" 2>/dev/null || true
+        log "✓ manage-api-token.sh"
     fi
     
     success "Helper scripts copied to $INSTALL_DIR"

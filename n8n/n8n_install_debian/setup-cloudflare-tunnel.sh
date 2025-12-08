@@ -11,6 +11,7 @@ TUNNEL_NAME_DEFAULT="n8n-tunnel"
 LOCAL_URL_DEFAULT="http://localhost:80"
 CONFIG_DIR="/root/.cloudflared"
 CLOUDFLARED_BIN="/usr/local/bin/cloudflared"
+API_TOKEN_FILE="/root/.cloudflare-api-token"
 
 # Color output
 RED='\033[0;31m'
@@ -69,36 +70,71 @@ mkdir -p "$CONFIG_DIR"
 
 # 🔐 Authentication Method Selection
 echo ""
-log "Choose authentication method:"
-echo "1. Cloudflare API Token (recommended for headless servers)"
-echo "2. Browser login (cloudflared login)"
-echo ""
-read -p "Select method [1/2]: " AUTH_METHOD
-AUTH_METHOD=${AUTH_METHOD:-1}
 
 USE_API=false
 CF_API_TOKEN=""
 CF_ACCOUNT_ID=""
 
-if [ "$AUTH_METHOD" = "1" ]; then
-    # API Token method
+# Check for saved API token
+if [ -f "$API_TOKEN_FILE" ]; then
+    CF_API_TOKEN=$(cat "$API_TOKEN_FILE")
+    log "Found saved API Token"
     USE_API=true
-    echo ""
-    log "Using Cloudflare API authentication"
-    echo ""
-    echo "Get your API Token from:"
-    echo "https://dash.cloudflare.com/profile/api-tokens"
-    echo ""
-    echo "Token permissions needed:"
-    echo "  - Account → Cloudflare Tunnel → Edit"
-    echo "  - Zone → DNS → Edit"
-    echo ""
-    read -p "Enter Cloudflare API Token: " CF_API_TOKEN
     
-    if [ -z "$CF_API_TOKEN" ]; then
-        error "API Token is required"
-        exit 1
+    echo ""
+    read -p "Use saved API Token? [Y/n]: " USE_SAVED
+    USE_SAVED=${USE_SAVED:-Y}
+    
+    if [[ ! "$USE_SAVED" =~ ^[Yy]$ ]]; then
+        CF_API_TOKEN=""
+        USE_API=false
     fi
+fi
+
+# If no saved token or user declined, ask for method
+if [ -z "$CF_API_TOKEN" ]; then
+    log "Choose authentication method:"
+    echo "1. Cloudflare API Token (recommended for headless servers)"
+    echo "2. Browser login (cloudflared login)"
+    echo ""
+    read -p "Select method [1/2]: " AUTH_METHOD
+    AUTH_METHOD=${AUTH_METHOD:-1}
+
+    if [ "$AUTH_METHOD" = "1" ]; then
+        # API Token method
+        USE_API=true
+        echo ""
+        log "Using Cloudflare API authentication"
+        echo ""
+        echo "Get your API Token from:"
+        echo "https://dash.cloudflare.com/profile/api-tokens"
+        echo ""
+        echo "Token permissions needed:"
+        echo "  - Account → Cloudflare Tunnel → Edit"
+        echo "  - Zone → DNS → Edit"
+        echo ""
+        read -p "Enter Cloudflare API Token: " CF_API_TOKEN
+        
+        if [ -z "$CF_API_TOKEN" ]; then
+            error "API Token is required"
+            exit 1
+        fi
+        
+        # Ask to save token
+        echo ""
+        read -p "Save API Token for future use? [Y/n]: " SAVE_TOKEN
+        SAVE_TOKEN=${SAVE_TOKEN:-Y}
+        
+        if [[ "$SAVE_TOKEN" =~ ^[Yy]$ ]]; then
+            echo "$CF_API_TOKEN" > "$API_TOKEN_FILE"
+            chmod 600 "$API_TOKEN_FILE"
+            success "API Token saved to $API_TOKEN_FILE"
+        fi
+    fi
+fi
+
+# Verify API token if using API method
+if [ "$USE_API" = true ] && [ -n "$CF_API_TOKEN" ]; then
     
     # Test API connection
     log "Testing API connection..."
