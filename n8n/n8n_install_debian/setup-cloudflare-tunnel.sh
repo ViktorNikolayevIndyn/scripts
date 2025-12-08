@@ -136,28 +136,8 @@ fi
 # Verify API token if using API method
 if [ "$USE_API" = true ] && [ -n "$CF_API_TOKEN" ]; then
     
-    # Test API connection
+    # Test API connection by fetching accounts
     log "Testing API connection..."
-    TEST_RESPONSE=$(curl -s -w "\n%{http_code}" -X GET "https://api.cloudflare.com/client/v4/user/tokens/verify" \
-        -H "Authorization: Bearer $CF_API_TOKEN" \
-        -H "Content-Type: application/json")
-    
-    HTTP_CODE=$(echo "$TEST_RESPONSE" | tail -n1)
-    TEST_BODY=$(echo "$TEST_RESPONSE" | head -n-1)
-    
-    if [ "$HTTP_CODE" != "200" ]; then
-        error "API Token verification failed (HTTP $HTTP_CODE)"
-        echo "Response: $TEST_BODY"
-        exit 1
-    fi
-    
-    TOKEN_STATUS=$(echo "$TEST_BODY" | jq -r '.result.status // empty')
-    if [ "$TOKEN_STATUS" != "active" ]; then
-        error "API Token is not active (status: $TOKEN_STATUS)"
-        exit 1
-    fi
-    
-    success "✓ API Token verified successfully"
     
     # Get Account ID
     log "Fetching account information..."

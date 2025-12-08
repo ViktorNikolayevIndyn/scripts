@@ -58,33 +58,33 @@ case $OPTION in
             log "Testing API Token..."
             TOKEN=$(cat "$API_TOKEN_FILE")
             
-            TEST_RESPONSE=$(curl -s -w "\n%{http_code}" -X GET "https://api.cloudflare.com/client/v4/user/tokens/verify" \
+            # Get account info first
+            ACCOUNTS_RESPONSE=$(curl -s -X GET "https://api.cloudflare.com/client/v4/accounts" \
                 -H "Authorization: Bearer $TOKEN" \
                 -H "Content-Type: application/json")
             
-            HTTP_CODE=$(echo "$TEST_RESPONSE" | tail -n1)
-            TEST_BODY=$(echo "$TEST_RESPONSE" | head -n-1)
+            ACCOUNT_ID=$(echo "$ACCOUNTS_RESPONSE" | jq -r '.result[0].id // empty')
+            ACCOUNT_NAME=$(echo "$ACCOUNTS_RESPONSE" | jq -r '.result[0].name // empty')
             
-            if [ "$HTTP_CODE" = "200" ]; then
-                TOKEN_STATUS=$(echo "$TEST_BODY" | jq -r '.result.status // empty')
-                if [ "$TOKEN_STATUS" = "active" ]; then
-                    success "✓ Token is valid and active"
-                    
-                    # Get account info
-                    ACCOUNTS_RESPONSE=$(curl -s -X GET "https://api.cloudflare.com/client/v4/accounts" \
-                        -H "Authorization: Bearer $TOKEN" \
-                        -H "Content-Type: application/json")
-                    
-                    ACCOUNT_NAME=$(echo "$ACCOUNTS_RESPONSE" | jq -r '.result[0].name // empty')
-                    if [ -n "$ACCOUNT_NAME" ]; then
-                        log "Account: $ACCOUNT_NAME"
-                    fi
-                else
-                    error "Token status: $TOKEN_STATUS"
-                fi
+            if [ -z "$ACCOUNT_ID" ]; then
+                error "Could not fetch account information"
+                echo "Response: $ACCOUNTS_RESPONSE" | jq '.'
+                exit 1
+            fi
+            
+            # Verify token using account-specific endpoint
+            TEST_RESPONSE=$(curl -s -X GET "https://api.cloudflare.com/client/v4/accounts/$ACCOUNT_ID/tokens/verify" \
+                -H "Authorization: Bearer $TOKEN")
+            
+            TOKEN_STATUS=$(echo "$TEST_RESPONSE" | jq -r '.result.status // empty')
+            
+            if [ "$TOKEN_STATUS" = "active" ]; then
+                success "✓ Token is valid and active"
+                log "Account: $ACCOUNT_NAME"
+                log "Account ID: $ACCOUNT_ID"
             else
-                error "Token verification failed (HTTP $HTTP_CODE)"
-                echo "$TEST_BODY" | jq '.'
+                error "Token verification failed"
+                echo "$TEST_RESPONSE" | jq '.'
             fi
         else
             # Save new token
@@ -101,18 +101,19 @@ case $OPTION in
             
             # Test before saving
             log "Testing token..."
-            TEST_RESPONSE=$(curl -s -w "\n%{http_code}" -X GET "https://api.cloudflare.com/client/v4/user/tokens/verify" \
+            ACCOUNTS_RESPONSE=$(curl -s -X GET "https://api.cloudflare.com/client/v4/accounts" \
                 -H "Authorization: Bearer $NEW_TOKEN" \
                 -H "Content-Type: application/json")
             
-            HTTP_CODE=$(echo "$TEST_RESPONSE" | tail -n1)
+            ACCOUNT_ID=$(echo "$ACCOUNTS_RESPONSE" | jq -r '.result[0].id // empty')
             
-            if [ "$HTTP_CODE" = "200" ]; then
+            if [ -n "$ACCOUNT_ID" ]; then
                 echo "$NEW_TOKEN" > "$API_TOKEN_FILE"
                 chmod 600 "$API_TOKEN_FILE"
                 success "Token saved to $API_TOKEN_FILE"
             else
                 error "Token verification failed"
+                echo "Response: $ACCOUNTS_RESPONSE" | jq '.'
                 exit 1
             fi
         fi
@@ -134,18 +135,19 @@ case $OPTION in
             
             # Test before saving
             log "Testing token..."
-            TEST_RESPONSE=$(curl -s -w "\n%{http_code}" -X GET "https://api.cloudflare.com/client/v4/user/tokens/verify" \
+            ACCOUNTS_RESPONSE=$(curl -s -X GET "https://api.cloudflare.com/client/v4/accounts" \
                 -H "Authorization: Bearer $NEW_TOKEN" \
                 -H "Content-Type: application/json")
             
-            HTTP_CODE=$(echo "$TEST_RESPONSE" | tail -n1)
+            ACCOUNT_ID=$(echo "$ACCOUNTS_RESPONSE" | jq -r '.result[0].id // empty')
             
-            if [ "$HTTP_CODE" = "200" ]; then
+            if [ -n "$ACCOUNT_ID" ]; then
                 echo "$NEW_TOKEN" > "$API_TOKEN_FILE"
                 chmod 600 "$API_TOKEN_FILE"
                 success "Token updated"
             else
                 error "Token verification failed"
+                echo "Response: $ACCOUNTS_RESPONSE" | jq '.'
                 exit 1
             fi
         else
