@@ -31,7 +31,7 @@ class CompanyStructureGenerator:
             base_path: Базовая директория для создания структуры
         """
         self.config_path = Path(config_path)
-        self.base_path = Path(base_path).resolve()
+        self.base_path = Path(base_path).expanduser().resolve()
         self.config: Dict[str, Any] = {}
         self.stats = {
             "folders_created": 0,
