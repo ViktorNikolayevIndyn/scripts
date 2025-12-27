@@ -140,7 +140,11 @@ function New-CompanyFolder {
             $script:Stats.FoldersCreated++
             
             # Relativen Pfad für Anzeige berechnen
-            $relativePath = $Path.Replace($script:RootPath, "").TrimStart("\")
+            if ($script:RootPath) {
+                $relativePath = $Path.Replace($script:RootPath, "").TrimStart("\")
+            } else {
+                $relativePath = $Path
+            }
             Write-Host "  📁 Erstelle: $relativePath" -ForegroundColor Green
         }
         
@@ -286,7 +290,7 @@ try {
         if ($oneDrivePath) {
             Write-Host "💡 OneDrive erkannt: $oneDrivePath" -ForegroundColor Yellow
             $useOneDrive = Read-Host "Möchten Sie OneDrive verwenden? (J/N)"
-            if ($useOneDrive -eq "J" -or $useOneDrive -eq "j" -or $useOneDrive -eq "Y" -or $useOneDrive -eq "y") {
+            if ($useOneDrive -match '^[JjYy]$') {
                 $TargetPath = $oneDrivePath
             }
         }
@@ -312,7 +316,7 @@ try {
     
     if (-not $Force) {
         $confirm = Read-Host "Fortfahren? (J/N)"
-        if ($confirm -ne "J" -and $confirm -ne "j" -and $confirm -ne "Y" -and $confirm -ne "y") {
+        if ($confirm -notmatch '^[JjYy]$') {
             Write-Host "❌ Abgebrochen durch Benutzer." -ForegroundColor Red
             exit 0
         }
@@ -364,7 +368,7 @@ try {
     
     # Explorer öffnen (optional)
     $openExplorer = Read-Host "Möchten Sie den Ordner im Explorer öffnen? (J/N)"
-    if ($openExplorer -eq "J" -or $openExplorer -eq "j" -or $openExplorer -eq "Y" -or $openExplorer -eq "y") {
+    if ($openExplorer -match '^[JjYy]$') {
         Start-Process explorer.exe $script:RootPath
     }
     

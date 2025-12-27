@@ -15,8 +15,15 @@
 #>
 
 # Windows Forms laden
-Add-Type -AssemblyName System.Windows.Forms
-Add-Type -AssemblyName System.Drawing
+try {
+    Add-Type -AssemblyName System.Windows.Forms
+    Add-Type -AssemblyName System.Drawing
+} catch {
+    Write-Host "❌ Fehler: Windows Forms konnte nicht geladen werden." -ForegroundColor Red
+    Write-Host "   Stellen Sie sicher, dass .NET Framework installiert ist." -ForegroundColor Yellow
+    Write-Host "   $_" -ForegroundColor Red
+    exit 1
+}
 
 # Encoding auf UTF-8 setzen
 $OutputEncoding = [System.Text.Encoding]::UTF8
@@ -116,7 +123,11 @@ function New-CompanyFolder {
             $script:Stats.FoldersCreated++
             
             # Relativen Pfad berechnen
-            $relativePath = $Path.Replace($script:RootPath, "").TrimStart("\")
+            if ($script:RootPath) {
+                $relativePath = $Path.Replace($script:RootPath, "").TrimStart("\")
+            } else {
+                $relativePath = $Path
+            }
             Add-LogMessage "Erstelle Ordner: $relativePath" "Success"
         }
         
@@ -367,7 +378,18 @@ $startButton.Add_Click({
         Add-LogMessage "Lade Konfiguration: $jsonPath" "Info"
         
         # JSON laden
-        $script:Config = Get-Content -Path $jsonPath -Raw -Encoding UTF8 | ConvertFrom-Json
+        try {
+            $script:Config = Get-Content -Path $jsonPath -Raw -Encoding UTF8 | ConvertFrom-Json
+        } catch {
+            Add-LogMessage "Fehler beim Laden der JSON-Datei: $_" "Error"
+            [System.Windows.Forms.MessageBox]::Show(
+                "JSON-Datei konnte nicht geladen werden:`n`n$_",
+                "Fehler",
+                [System.Windows.Forms.MessageBoxButtons]::OK,
+                [System.Windows.Forms.MessageBoxIcon]::Error
+            )
+            return
+        }
         
         Add-LogMessage "Firma: $($script:Config.company_name)" "Success"
         Add-LogMessage "Version: $($script:Config.version)" "Success"
