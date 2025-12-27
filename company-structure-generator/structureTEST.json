@@ -1,0 +1,317 @@
+{
+  "company_name": "InsideDynamic-GmbH",
+  "description": "Dokumentenmanagementsystem für InsideDynamic GmbH - Verwaltung aller Firmendokumente",
+  "version": "1.0",
+  "created": "2024-12-26",
+  "author": "Viktor Nikolayev",
+  "structure": {
+    "08_Fuhrpark": {
+      "description": "Fuhrparkmanagement",
+      "folders": {
+        "Unfälle_Schäden": {
+          "description": "Unfallberichte, Schadensmeldungen"
+        },
+        "Fahrzeuge": {
+          "description": "Alle Firmenfahrzeuge"
+        },
+        "Tankkarten": {
+          "description": "Tankkarten: Shell, Aral"
+        },
+        "Versicherungen": {
+          "description": "Kfz-Versicherungen"
+        },
+        "Bußgelder_Verkehrsverstöße": {
+          "description": "Bußgeldbescheide"
+        },
+        "Führerscheine": {
+          "description": "Kopien aller Führerscheine"
+        }
+      }
+    },
+    "07_Schulungen-Weiterbildung": {
+      "description": "Schulungen, Weiterbildung und Zertifizierungen",
+      "folders": {
+        "Schulungs-Controlling": {
+          "description": "ROI-Analyse, Statistiken"
+        },
+        "Interne-Schulungen": {
+          "description": "Interne Schulungsprogramme: Onboarding, Compliance"
+        },
+        "Zertifizierungen": {
+          "description": "Team und Firmen-Zertifikate"
+        },
+        "Externe-Schulungen": {
+          "description": "Externe Anbieter: Mike Bergmann, Udemy, LinkedIn Learning"
+        },
+        "Konferenzen-Events": {
+          "description": "Konferenzen und Networking-Events"
+        },
+        "_VORLAGEN": {
+          "description": "⚠️ SHORTCUT zu 10_Vorlagen/10_Schulungen/"
+        },
+        "Weiterbildungsplan": {
+          "description": "Budget, Jahresplan, Skill-Matrix"
+        }
+      }
+    },
+    "00_SCAN": {
+      "description": "Inbox für alle gescannten Dokumente - temporärer Speicherort vor der Verarbeitung",
+      "folders": {
+        "Post_Kunden": {
+          "description": "Wichtige Post von Kunden"
+        },
+        "Für_sevDesk": {
+          "description": "Dokumente die direkt in sevDesk/Lexoffice/Odoo geladen werden"
+        },
+        "Sonstiges": {
+          "description": "Unklar wohin - hier sammeln bis geklärt"
+        },
+        "Archiviert": {
+          "description": "Bereits verarbeitete und verschobene Scans"
+        },
+        "Post_Behörden": {
+          "description": "Briefe von Finanzamt, Gewerbeamt, Handelsregister und anderen Behörden"
+        },
+        "HR_Dokumente": {
+          "description": "Personal-Dokumente wie Arbeitsverträge, Bewerbungen, Zeugnisse"
+        },
+        "Verträge": {
+          "description": "Gescannte Verträge vor der Verarbeitung und Ablage"
+        }
+      }
+    },
+    "02_Personal": {
+      "description": "Alle HR-Dokumente und Mitarbeiterunterlagen",
+      "folders": {
+        "Arbeitszeit": {
+          "description": "Zeiterfassung, Überstundenkonten"
+        },
+        "Mitarbeiter": {
+          "description": "Alle Mitarbeiter: Festangestellte, Freiberufler, Subunternehmer"
+        },
+        "Bewerbungen": {
+          "description": "Bewerbungen von Kandidaten"
+        },
+        "Betriebsvereinbarungen": {
+          "description": "Homeoffice-Regelung, Arbeitszeitregelung"
+        },
+        "Praktikanten": {
+          "description": "Praktikanten-Dokumente"
+        },
+        "_VORLAGEN": {
+          "description": "⚠️ SHORTCUT zu 10_Vorlagen/01_Personal/"
+        },
+        "HR-Controlling": {
+          "description": "HR-Analysen und Statistiken"
+        },
+        "Stellenausschreibungen": {
+          "description": "Job Postings"
+        },
+        "Geschäftsführung": {
+          "description": "Geschäftsführer-Dokumente"
+        }
+      }
+    },
+    "05_Vertrieb": {
+      "description": "Vertrieb und Marketing",
+      "folders": {
+        "Angebote": {
+          "description": "Alle Angebote an Kunden"
+        },
+        "Preislisten": {
+          "description": "Preislisten für Dienstleistungen"
+        },
+        "Messen_Events": {
+          "description": "Messen und Events"
+        },
+        "Marketing": {
+          "description": "Marketing-Materialien: Website, Social Media"
+        },
+        "Partnerschaften": {
+          "description": "Partner-Vereinbarungen, Reseller-Verträge"
+        },
+        "Leads": {
+          "description": "Lead-Management"
+        },
+        "_VORLAGEN": {
+          "description": "⚠️ SHORTCUT zu 10_Vorlagen/05_Vertrieb/"
+        }
+      }
+    },
+    "04_Kunden": {
+      "description": "Alle Kundendaten und Verträge",
+      "folders": {
+        "_VORLAGEN": {
+          "description": "⚠️ SHORTCUT zu 10_Vorlagen/03_Kunden/"
+        },
+        "Ehemalige_Kunden": {
+          "description": "Archivierte Kunden"
+        },
+        "Aktive_Kunden": {
+          "description": "Alle aktiven Kunden"
+        },
+        "Potentielle_Kunden": {
+          "description": "Leads und potentielle Kunden"
+        }
+      }
+    },
+    "06_Einkauf": {
+      "description": "Einkauf und Beschaffung",
+      "folders": {
+        "Rahmenverträge": {
+          "description": "Rahmenverträge mit Lieferanten"
+        },
+        "Inventar": {
+          "description": "Hardware-, Software-, Office-Inventar"
+        },
+        "Garantien_Gewährleistungen": {
+          "description": "Garantien für Hardware und Software"
+        },
+        "Lieferanten": {
+          "description": "Alle Lieferanten"
+        }
+      }
+    },
+    "03_Finanzen": {
+      "description": "Finanzielle Dokumente (NICHT laufende Buchhaltung - das läuft in sevDesk!)",
+      "folders": {
+        "Banking": {
+          "description": "Bankverträge, Bankvollmachten"
+        },
+        "Sonstiges": {
+          "description": "Mahnbescheide, Inkasso"
+        },
+        "Jahresabschlüsse": {
+          "description": "Jahresabschlüsse, Bilanzen, GuV"
+        },
+        "Verträge": {
+          "description": "Finanzielle Software-Verträge: sevDesk, Odoo"
+        },
+        "_VORLAGEN": {
+          "description": "⚠️ SHORTCUT zu 10_Vorlagen/02_Finanzen/"
+        },
+        "Steuern": {
+          "description": "Steuerdokumente, Steuerbescheide"
+        }
+      }
+    },
+    "09_IT-Infrastruktur": {
+      "description": "IT-Infrastruktur der Firma",
+      "folders": {
+        "Software-Lizenzen": {
+          "description": "Lizenzverwaltung"
+        },
+        "IT-Sicherheit": {
+          "description": "Firewall, VPN, Security-Audits"
+        },
+        "Zugangsdaten": {
+          "description": "🔐 KRITISCH! NUR VERSCHLÜSSELT! Password Manager nutzen!"
+        },
+        "Dokumentation": {
+          "description": "Systemdokumentation, Notfallhandbuch"
+        },
+        "Domains": {
+          "description": "Domain-Verwaltung, SSL-Zertifikate"
+        },
+        "Cloud-Services": {
+          "description": "AWS, Microsoft 365, GitHub, Hetzner"
+        }
+      }
+    },
+    "10_Vorlagen": {
+      "description": "⭐ ZENTRALE VORLAGEN - Alle Dokumentenvorlagen an einem Ort",
+      "folders": {
+        "09_Rechtliche-Vorlagen": {
+          "description": "Rechtliche Vorlagen: AGB, NDA, AV-Vertrag, Datenschutz"
+        },
+        "01_Personal": {
+          "description": "HR-Vorlagen: Arbeitsvertrag, Zeugnis"
+        },
+        "02_Finanzen": {
+          "description": "Finanz-Vorlagen: Rechnung, Angebot, Mahnung"
+        },
+        "04_Projekte": {
+          "description": "Projekt-Vorlagen: Projektplan, Meeting-Protokoll"
+        },
+        "07_Checklisten": {
+          "description": "Checklisten: Onboarding, DSGVO"
+        },
+        "06_Briefe": {
+          "description": "Brief-Vorlagen: Geschäftsbrief, E-Mail-Signatur"
+        },
+        "03_Kunden": {
+          "description": "Kunden-Vorlagen: Rahmenvertrag, NDA, SLA"
+        },
+        "10_Schulungen": {
+          "description": "Schulungs-Vorlagen: Schulungsplan, Zertifikat"
+        },
+        "08_Technische-Dokumentation": {
+          "description": "Tech-Vorlagen: API-Docs, README"
+        },
+        "05_Vertrieb": {
+          "description": "Vertriebs-Vorlagen: Präsentationen"
+        }
+      }
+    },
+    "11_Archiv": {
+      "description": "Archivierte Dokumente sortiert nach Jahr",
+      "folders": {
+        "Nach_Jahr": {
+          "description": "Archiv sortiert nach Jahren"
+        }
+      }
+    },
+    "PROJEKTE": {
+      "description": "Alle Projekte - getrennt von Firmenverwaltung",
+      "folders": {
+        "Abgeschlossene_Projekte": {
+          "description": "Abgeschlossene Projekte"
+        },
+        "Interne_Projekte": {
+          "description": "Interne Projekte: Website-Relaunch, CRM"
+        },
+        "Subunternehmer-Projekte": {
+          "description": "Projekte als Subunternehmer"
+        },
+        "Eigene_Produkte": {
+          "description": "Eigene Softwareprodukte: Linkify, Webhosting"
+        },
+        "Kundenprojekte": {
+          "description": "Projekte für Kunden"
+        },
+        "_VORLAGEN": {
+          "description": "⚠️ SHORTCUT zu 10_Vorlagen/04_Projekte/"
+        }
+      }
+    },
+    "01_Unternehmen": {
+      "description": "Alle juristischen Dokumente der Firma",
+      "folders": {
+        "Gesellschafter": {
+          "description": "Gesellschafterliste, Gesellschafterbeschlüsse, Vollmachten"
+        },
+        "Gründung": {
+          "description": "Gründungsdokumente: Gesellschaftsvertrag, Handelsregister, Gewerbeanmeldung"
+        },
+        "Mitgliedschaften": {
+          "description": "IHK-Mitgliedschaft, Branchenverbände"
+        },
+        "Versicherungen": {
+          "description": "Betriebshaftpflicht, D&O-Versicherung, Cyber-Versicherung"
+        },
+        "Satzung": {
+          "description": "Aktuelle und historische Satzungen der GmbH"
+        },
+        "Verträge": {
+          "description": "Verträge der Firma: Mietverträge, Lieferantenverträge"
+        },
+        "Korrespondenz": {
+          "description": "Wichtige Korrespondenz mit Behörden"
+        },
+        "Compliance": {
+          "description": "DSGVO-Dokumentation, GoBD, IT-Sicherheitskonzept"
+        }
+      }
+    }
+  }
+}
